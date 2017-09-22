@@ -28,8 +28,8 @@ GameConfig =
 
 	--InviteUrl = "http://jhysz.download.changlaith.com/downloadurl/download.php",      --邀请好友一起玩游戏url
 	InviteUrl = "http://jhysz.api.changlaith.com/downpage/main.php",      --邀请好友一起玩游戏url
-	-- 连接的HubServerURL 域名(正式服务器:jhysz.hub.changlaith.com 苹果审核域名:jhysz.v10101hub.changlaith.com 本地服务器:192.168.1.3)
-	HubServerURL = "192.168.2.48",
+	-- 连接的HubServerURL 域名(正式服务器:clysz.hub.changlaith.com 苹果审核域名:jhysz.v10101hub.changlaith.com 本地服务器:192.168.1.3)
+	HubServerURL = "clysz.hub.changlaith.com",
 	GameServerURL = "jhysz.s10.changlaith.com",		-- 链接服务器地址 由服务器下发
 	HubServerPort = 20000,
 	GameServerIP = "",
