@@ -518,7 +518,7 @@ function NetMsgHandler.HandleReceivedLogin(message)
 				IsAutoConnect = false
 			end
 			-- 若是在大厅UI则刷新UI
-			local hallUI = CS.WindowManager.Instance:FindWindowNodeByName("UIHall")
+			local hallUI = CS.WindowManager.Instance:FindWindowNodeByName("HallUI")
 			if hallUI ~= nil then
 				hallUI.WindowData = 1
 			end
@@ -531,7 +531,7 @@ function NetMsgHandler.HandleReceivedLogin(message)
 		else
 			-- 打开HallUI，关闭登陆界面
 			--print("正常登陆")
-			openparam = CS.WindowNodeInitParam('UIHall')
+			openparam = CS.WindowNodeInitParam('HallUI')
 			openparam.NodeType = 0
 			openparam.LoadComplatedCallBack =
 			function (windowNode)
@@ -846,7 +846,7 @@ function NetMsgHandler.Received_CS_Enter_Room(message)
 			local openparam = CS.WindowNodeInitParam("UIGame")
 			openparam.NodeType = 0
 			openparam.LoadComplatedCallBack = function (windowNode)
-				CS.WindowManager.Instance:CloseWindow("UIHall", false)
+				CS.WindowManager.Instance:CloseWindow("HallUI", false)
 				NetMsgHandler.ShowFreeRoomEnterMessageBox()
 			end
 			
@@ -858,7 +858,7 @@ function NetMsgHandler.Received_CS_Enter_Room(message)
 		end
 		
 	else
-		CS.BubblePrompt.Show(data.GetString("Enter_Room_Error_".. resultType), "UIHall")
+		CS.BubblePrompt.Show(data.GetString("Enter_Room_Error_".. resultType), "HallUI")
 	end
 end
 
@@ -902,7 +902,7 @@ function NetMsgHandler.ExitRoomToHall(handleType)
 	end
 	
 	-- 打开大厅界面，关闭游戏界面
-	local openparam = CS.WindowNodeInitParam("UIHall")
+	local openparam = CS.WindowNodeInitParam("HallUI")
 	openparam.NodeType = 0
 	openparam.LoadComplatedCallBack =
 	function (windowNode)
@@ -912,7 +912,7 @@ function NetMsgHandler.ExitRoomToHall(handleType)
 		CS.BubblePrompt.ClearPrompt("UIGame")
 		CS.WindowManager.Instance:CloseWindow("UIGame", false)
 		if handleType == 2 then
-			CS.BubblePrompt.Show(data.GetString("Tip_Exit_Room_2"), "UIHall")
+			CS.BubblePrompt.Show(data.GetString("Tip_Exit_Room_2"), "HallUI")
 		end
 	end
 	CS.WindowManager.Instance:OpenWindow(openparam)
@@ -2159,7 +2159,7 @@ function NetMsgHandler.HandleAccountInfo(message)
 			end
 		else
 			if GameData.GameState == GAME_STATE.ROOM then  --如果当前游戏状态为房间，切换界面为大厅
-				local openparam = CS.WindowNodeInitParam("UIHall")
+				local openparam = CS.WindowNodeInitParam("HallUI")
 				openparam.NodeType = 0
 				openparam.LoadComplatedCallBack =
 				function (windowNode)
@@ -2211,7 +2211,7 @@ function NetMsgHandler.HandleRoomInfo(message)
 		elseif GameData.GameState == GAME_STATE.HALL then --切换界面为房间
 			local openparam = CS.WindowNodeInitParam("UIGame")
 			openparam.NodeType = 0
-			openparam.LoadComplatedCallBack = function (windowNode) CS.WindowManager.Instance:CloseWindow("UIHall", false) end
+			openparam.LoadComplatedCallBack = function (windowNode) CS.WindowManager.Instance:CloseWindow("HallUI", false) end
 			CS.WindowManager.Instance:OpenWindow(openparam)
 			-- 切换状态为房间
 			GameData.GameState = GAME_STATE.ROOM
