@@ -86,10 +86,13 @@ function EnterSelectedRoom(roomType)
 end
 
 -- 进入选中房间
-function EnterSelectedGameRoom()
-    if GameData.HallData.SelectType == 1 or GameData.HallData.SelectType == 2 then
-        EnterGameRoomByRoomID(GameData.HallData.Data[GameData.HallData.SelectType])
+function EnterSelectedGameRoom(roomIndexParam)
+    local roomConfig = data.RoomConfig[roomIndexParam]
+    if nil == roomConfig then
+        print('聚龙厅配置错误')
+        return
     end
+    EnterGameRoomByRoomID(roomConfig.TemplateID)
 end
 
 -- 进入房间
@@ -221,27 +224,21 @@ end
 ------------------------房间类型选择----------------------------------
 -- 初始化房间基础信息
 function InitHallUIRoomTypeInfo()
-    -- 初始化试水厅信息
-    local shishuitingRoot = this.transform:Find('Canvas/Shishuiting/RoomCards')
-    for index = 1, 1, 1 do
-        local roomConfig = data.RoomConfig[RoomType2Offset + index]
-        shishuitingRoot:Find('RoomInfo' .. index .. '/RoomID'):GetComponent("Text").text = roomConfig.ShowName
-        local betLimitText = shishuitingRoot:Find('RoomInfo' .. index .. '/BetLimit/Value'):GetComponent("Text")
-        betLimitText.text = string.format("限注:%s-%s", lua_NumberToStyle1String(GameConfig.GetFormatColdNumber(roomConfig.BettingLongHu[1])), lua_NumberToStyle1String(GameConfig.GetFormatColdNumber(roomConfig.BettingLongHu[2])))
-    end
 
     -- 初始化竞咪厅信息
-    local roomCards = this.transform:Find('Canvas/Jingmiting/RoomCards')
+    local roomRoot = this.transform:Find('Canvas/Room3/Room3Content/Viewport/Content')
 
     for index = 1, 7, 1 do
-        local roomInfoItem = roomCards:Find('RoomInfo' .. index)
-        local roomConfig = data.RoomConfig[RoomType1Offset + index]
+        local roomInfoItem = roomRoot:Find('Room3Info' .. index)
+        local roomConfig = data.RoomConfig[index]
         if roomConfig ~= nil then
             roomInfoItem.gameObject:SetActive(true)
-            roomInfoItem:Find('RoomID'):GetComponent("Text").text = roomConfig.ShowName
-            roomInfoItem:GetComponent("CoverFlowItem"):OnValueChanged('+',( function(selected) JingmitingRoomInfo_OnValueChanged(selected, roomConfig) end))
-            roomInfoItem:GetComponent("CoverFlowItem"):CenterItemOnClicked('+', EnterSelectedGameRoom)
-            roomInfoItem:Find('BetLimit/Value'):GetComponent("Text").text = string.format("限注:%s-%s", lua_NumberToStyle1String(GameConfig.GetFormatColdNumber(roomConfig.BettingLongHu[1])), lua_NumberToStyle1String(GameConfig.GetFormatColdNumber(roomConfig.BettingLongHu[2])))
+            roomInfoItem:Find('back/RoomID/Value'):GetComponent("Text").text = roomConfig.ShowName
+            roomInfoItem:GetComponent("Button").onClick:AddListener( function() EnterSelectedGameRoom(index) end)
+            roomInfoItem:Find('back/ChipLimit/Value'):GetComponent("Text").text = string.format("%s-%s", lua_NumberToStyle1String(GameConfig.GetFormatColdNumber(roomConfig.BettingLongHu[1])), lua_NumberToStyle1String(GameConfig.GetFormatColdNumber(roomConfig.BettingLongHu[2])))
+            for roomType = 1, 5, 1 do
+                roomInfoItem:Find('back/RoomID/RoomType/RoomType' .. roomType).gameObject:SetActive(roomConfig.Type == roomType)
+            end
         else
             roomInfoItem.gameObject:SetActive(false)
         end
@@ -252,6 +249,52 @@ function InitHallUIRoomTypeInfo()
         vipTypeItem:GetComponent("CoverFlowItem"):OnValueChanged('+',( function(selected) ViptingRoomType_OnValueChanged(selected, index) end))
     end
 end
+
+function RefreshRoomList3()
+    -- body
+    local roomDatas = GetRoomConfigDatasByTab(TabType.CUOPAI)
+    local roomItemParent = this.transform:Find('Canvas/Panel_List/RoomList_1/Viewport/Content')
+    local i = 1
+    RoomUI = { }
+    for key, roomData in ipairs(roomDatas) do
+        if i > roomItemParent.childCount - 1 then return end
+        local roomItemUI = roomItemParent:GetChild(i)
+        roomItemUI.gameObject:SetActive(true)
+        ResetRoomListItem(roomItemUI, roomData)
+        i = i + 1
+    end
+    local maxRoomNum = GetMaxRoomNum()
+    for i = #roomDatas + 1, roomItemParent.childCount - 1 do
+        local roomItemUI = roomItemParent:GetChild(i)
+        roomItemUI.gameObject:SetActive(false)
+    end
+end
+
+function GetRoomConfigDatasByTab(tab)
+    local roomDatas = { }
+    local upperLimit = 0
+    local lowerLimit = 0
+    if tab == TabType.CUOPAI then
+        lowerLimit = 101
+        upperLimit = 199
+    elseif tab == TabType.JUNIU then
+        lowerLimit = 201
+        upperLimit = 299
+    end
+    if data.RoomConfig then
+        for k, roomData in pairs(data.RoomConfig) do
+            if roomData.TemplateID >= lowerLimit and roomData.TemplateID <= upperLimit then
+                table.insert(roomDatas, roomData)
+            end
+        end
+    end
+
+    table.sort(roomDatas, function(lhs, rhs)
+        return lhs.TemplateID < rhs.TemplateID
+    end )
+    return roomDatas
+end	
+
 
 -- 房间类型改变刷新
 function HandleRoomTypeChanged(roomType)
@@ -293,7 +336,6 @@ function HandleRoomTypeChangedToJingmiting(roomID)
             HandleJingmitingRoomCardChanged(data.RoomConfig[roomID].TemplateID)
         end
     end
-    this.transform:Find('Canvas/Jingmiting/RoomCards'):GetComponent("CoverFlow"):ResetCenterItem(roomID - RoomType1Offset - 1)
 end
 
 -- 搓牌厅 轮盘选中变化通知
