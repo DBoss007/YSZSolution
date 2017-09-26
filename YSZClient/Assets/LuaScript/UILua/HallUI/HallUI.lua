@@ -12,7 +12,6 @@ function Awake()
     this.transform:Find('Canvas/Bottom/ButtonMail'):GetComponent("Button").onClick:AddListener(MailButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonRank'):GetComponent("Button").onClick:AddListener(RankButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonSetting'):GetComponent("Button").onClick:AddListener(SettingButtonOnClick)
-    this.transform:Find('Canvas/DetailInfo/Panel1/EnterRoom'):GetComponent("Button").onClick:AddListener(EnterSelectedGameRoom)
     this.transform:Find('Canvas/DetailInfo/Panel1/Statistics/StatisticsLeft'):GetComponent("ScrollRectExtend2").onClick:AddListener(EnterSelectedGameRoom)
     this.transform:Find('Canvas/DetailInfo/Panel1/Statistics/StatisticsRight'):GetComponent("ScrollRectExtend2").onClick:AddListener(EnterSelectedGameRoom)
     this.transform:Find('Canvas/DetailInfo/Panel2/Content/CreateRoom'):GetComponent("Button").onClick:AddListener(CreateVipRoomButtonOnClick)
@@ -234,7 +233,7 @@ function InitHallUIRoomTypeInfo()
         if roomConfig ~= nil then
             roomInfoItem.gameObject:SetActive(true)
             roomInfoItem:Find('back/RoomID/Value'):GetComponent("Text").text = roomConfig.ShowName
-            roomInfoItem:GetComponent("Button").onClick:AddListener( function() EnterSelectedGameRoom(index) end)
+            roomInfoItem:Find('back'):GetComponent("Button").onClick:AddListener( function() EnterSelectedGameRoom(index) end)
             roomInfoItem:Find('back/ChipLimit/Value'):GetComponent("Text").text = string.format("%s-%s", lua_NumberToStyle1String(GameConfig.GetFormatColdNumber(roomConfig.BettingLongHu[1])), lua_NumberToStyle1String(GameConfig.GetFormatColdNumber(roomConfig.BettingLongHu[2])))
             for roomType = 1, 5, 1 do
                 roomInfoItem:Find('back/RoomID/RoomType/RoomType' .. roomType).gameObject:SetActive(roomConfig.Type == roomType)
