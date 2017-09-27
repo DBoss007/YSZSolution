@@ -43,8 +43,8 @@ function Awake()
     m_Left_ItemSize = leftGridLayoutGroup.cellSize.x + leftGridLayoutGroup.spacing.x
     local rightGridLayoutGroup = m_Right_StatisticsRoot:GetComponent("GridLayoutGroup")
     m_Right_ItemSize = rightGridLayoutGroup.cellSize.x + rightGridLayoutGroup.spacing.x
-	delayList = {}
-    UpdateIndex = 0 
+    delayList = { }
+    UpdateIndex = 0
     IsCanUpdate = true
     CreateStatisticsTrendItems(m_Left_StatisticsRoot, m_Left_ItemCount, m_Left_OffsetY * m_Left_DisplayColumnCount)
     CreateStatisticsTrendItems(m_Right_StatisticsRoot, m_Right_ItemCount, m_Right_OffsetY * m_Right_DisplayColumnCount)
@@ -54,19 +54,19 @@ end
 
 function Update()
     if not IsCanUpdate then
-        return 
+        return
     end
-	if delayList[UpdateIndex+UpdateGap] then
-        for  i = 1 , UpdateGap do
-            delayList[UpdateIndex+i]()
+    if delayList[UpdateIndex + UpdateGap] then
+        for i = 1, UpdateGap do
+            delayList[UpdateIndex + i]()
         end
         UpdateIndex = UpdateIndex + UpdateGap
     else
-        for i = UpdateIndex+1 , #delayList do
+        for i = UpdateIndex + 1, #delayList do
             delayList[i]()
         end
         isInited = true
-        ResetRelativeRoomID(m_RelativeRoomID) 
+        ResetRelativeRoomID(m_RelativeRoomID)
         IsCanUpdate = false
     end
 end
@@ -108,17 +108,17 @@ end
 
 -- 创建统计趋势的元素
 function CreateStatisticsTrendItems(trendParent, childCount, displayCount)
-	local roundItem = trendParent:GetChild(0)
-	roundItem.gameObject:SetActive(false)
-	lua_Transform_ClearChildren(trendParent, true)
-	for	 index = 1, childCount, 1 do
-		delayList[#delayList+1] = function ( ... )
-			local instanceItem = CS.UnityEngine.Object.Instantiate(roundItem)
+    local roundItem = trendParent:GetChild(0)
+    roundItem.gameObject:SetActive(false)
+    lua_Transform_ClearChildren(trendParent, true)
+    for index = 1, childCount, 1 do
+        delayList[#delayList + 1] = function(...)
+            local instanceItem = CS.UnityEngine.Object.Instantiate(roundItem)
             instanceItem.gameObject.name = 'Item (' .. tostring(index .. ')')
-			CS.Utility.ReSetTransform(instanceItem, trendParent)
-			instanceItem.gameObject:SetActive(false)
-		end
-	end
+            CS.Utility.ReSetTransform(instanceItem, trendParent)
+            instanceItem.gameObject:SetActive(false)
+        end
+    end
 end
 
 -- 重置统计信息
@@ -183,16 +183,18 @@ end
 function SetTrendItemResult(roundItem, roundResult)
     roundItem.gameObject:SetActive(true)
     local valueIcon = roundItem.transform:Find('ValueIcon'):GetComponent("Image")
-    if roundResult ~= nil then        
+    if roundResult ~= nil then
         valueIcon.gameObject:SetActive(true)
         local spriteName = GetTrendResultSpriteOfTrendItem(roundResult)
         valueIcon:ResetSpriteByName(spriteName)
-        roundItem:Find("LongNiuNiu").gameObject:SetActive(CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.LONG_NIUNIU) == WIN_CODE.LONG_NIUNIU)
-        roundItem:Find("HuNiuNiu").gameObject:SetActive(CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.HU_NIUNIU) == WIN_CODE.HU_NIUNIU)
+        roundItem:Find("BaoZi").gameObject:SetActive(CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.LONGHUBAOZI) == WIN_CODE.LONGHUBAOZI)
+        roundItem:Find("LongJinHua").gameObject:SetActive(CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.LONGJINHUA) == WIN_CODE.LONGJINHUA)
+        roundItem:Find("HuJinHua").gameObject:SetActive(CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.HUJINHUA) == WIN_CODE.HUJINHUA)
     else
         valueIcon.gameObject:SetActive(false)
-        roundItem:Find("LongNiuNiu").gameObject:SetActive(false)
-        roundItem:Find("HuNiuNiu").gameObject:SetActive(false)
+        roundItem:Find("BaoZi").gameObject:SetActive(false)
+        roundItem:Find("LongJinHua").gameObject:SetActive(false)
+        roundItem:Find("HuJinHua").gameObject:SetActive(false)
     end
 end
 
@@ -211,8 +213,9 @@ function RefreshRightStatisticsTrendByStatistics(statistics)
             trendItem.gameObject:SetActive(false)
         end
         trendItem:Find("ValueIcon").gameObject:SetActive(false)
-        trendItem:Find("LongNiuNiu").gameObject:SetActive(false)
-        trendItem:Find("HuNiuNiu").gameObject:SetActive(false)
+        trendItem:Find("BaoZi").gameObject:SetActive(false)
+        trendItem:Find("LongJinHua").gameObject:SetActive(false)
+        trendItem:Find("HuJinHua").gameObject:SetActive(false)
     end
 
     for roundIndex = 1, statistics.Round.CurrentRound, 1 do
@@ -221,21 +224,21 @@ function RefreshRightStatisticsTrendByStatistics(statistics)
 end
 
 function ResetStatisticsRootToRightVisible(roundCount)
-    local leftScrollRect = this.transform:Find('StatisticsLeft'):GetComponent("ScrollRect")
-    leftScrollRect.enabled = false
+    --local leftScrollRect = this.transform:Find('StatisticsLeft'):GetComponent("ScrollRect")
+    --leftScrollRect.enabled = false
     local leftDisplayCount = math.max(math.ceil(roundCount / m_Left_OffsetY), m_Left_DisplayColumnCount)
     local leftPosX = m_Left_StatisticsRoot.parent.rect.size.x - leftDisplayCount * m_Left_ItemSize
     local leftLocalPos = m_Left_StatisticsRoot.localPosition
     leftLocalPos.x = leftPosX
-    leftScrollRect.enabled = true
+    --leftScrollRect.enabled = true
 
-    local rightScrollRect = this.transform:Find('StatisticsRight'):GetComponent("ScrollRect")
-    rightScrollRect.enabled = false
+    --local rightScrollRect = this.transform:Find('StatisticsRight'):GetComponent("ScrollRect")
+    --rightScrollRect.enabled = false
     local rightDisplayCount = math.max(math.ceil(m_Right_CurrentMaxDisplayPos / m_Right_OffsetY))
     local rightPosX =(m_Right_StatisticsRoot.parent.rect.size.x - rightDisplayCount * m_Right_ItemSize)
     local rightLocalPos = m_Right_StatisticsRoot.localPosition
     rightLocalPos.x = rightPosX
-    rightScrollRect.enabled = true
+    --rightScrollRect.enabled = true
 end
 
 -- 追加统计值
@@ -280,8 +283,8 @@ function AppendRightStatisticsTrendValue(newValue)
     if m_Right_LastPos > m_Right_DisplayColumnCount * m_Left_OffsetY then
         local columnMax = math.ceil(m_Right_LastPos / m_Right_OffsetY) * m_Right_OffsetY
         for index = columnMax - m_Right_OffsetY, columnMax, 1 do
-            if m_Right_StatisticsRoot:Find('Item (' .. index.. ')') then
-                m_Right_StatisticsRoot:Find('Item (' .. index.. ')').gameObject:SetActive(true)
+            if m_Right_StatisticsRoot:Find('Item (' .. index .. ')') then
+                m_Right_StatisticsRoot:Find('Item (' .. index .. ')').gameObject:SetActive(true)
             end
         end
     end
@@ -292,36 +295,43 @@ function AppendRightStatisticsTrendValue(newValue)
     if trendItem then
         trendItem:Find('ValueIcon'):GetComponent("Image"):ResetSpriteByName(GetTrend2IconNameByValue(newValue))
         trendItem:Find("ValueIcon").gameObject:SetActive(true)
-        trendItem:Find("LongNiuNiu").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.LONG_NIUNIU) == WIN_CODE.LONG_NIUNIU)
-        trendItem:Find("HuNiuNiu").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.HU_NIUNIU) == WIN_CODE.HU_NIUNIU)
+        trendItem:Find("BaoZi").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.LONGHUBAOZI) == WIN_CODE.LONGHUBAOZI)
+        trendItem:Find("LongJinHua").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.LONGJINHUA) == WIN_CODE.LONGJINHUA)
+        trendItem:Find("HuJinHua").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.HUJINHUA) == WIN_CODE.HUJINHUA)
     end
 end
 
 -- 刷新统计数量相关内容
 function RefreshStatisticsCountsByStatistics(statistics)
     local rightBottom = this.transform:Find('RightBottom')
---    rightBottom:Find('Row1/Item1/Value'):GetComponent("Text").text = tostring(statistics.Counts.LongWin)
---    rightBottom:Find('Row1/Item2/Value'):GetComponent("Text").text = tostring(statistics.Counts.HuWin)
-    rightBottom:Find('Row1/Item5/Value'):GetComponent("Text").text = string.format("%d/%d", statistics.Round.CurrentRound, statistics.Round.MaxRound)
-    rightBottom:Find('Row1/Item3/Value'):GetComponent("Text").text = tostring(statistics.Counts.LongNiuNiu)
-    rightBottom:Find('Row1/Item4/Value'):GetComponent("Text").text = tostring(statistics.Counts.HuNiuNiu)
+    rightBottom:Find('Row1/Item1/Value'):GetComponent("Text").text = tostring(statistics.Counts.LongWin)
+    rightBottom:Find('Row1/Item2/Value'):GetComponent("Text").text = tostring(statistics.Counts.HuWin)
+    rightBottom:Find('Row1/Item3/Value'):GetComponent("Text").text = tostring(statistics.Counts.HeJu)
+    rightBottom:Find('Row1/Item4/Value'):GetComponent("Text").text = string.format("%d/%d", statistics.Round.CurrentRound, statistics.Round.MaxRound)
+    rightBottom:Find('Row2/Item1/Value'):GetComponent("Text").text = tostring(statistics.Counts.LongJinHua)
+    rightBottom:Find('Row2/Item2/Value'):GetComponent("Text").text = tostring(statistics.Counts.HuJinHua)
+    rightBottom:Find('Row2/Item3/Value'):GetComponent("Text").text = tostring(statistics.Counts.LongHuBaoZi)
 end
 
 function GetTrendResultSpriteOfTrendItem(roundResult)
-    if CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.LONG_WIN) == WIN_CODE.LONG_WIN then
+    if CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.LONG) == WIN_CODE.LONG then
         return 'sprite_Trend_Icon_1'
-    elseif CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.HU_WIN) == WIN_CODE.HU_WIN then
+    elseif CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.HU) == WIN_CODE.HU then
         return 'sprite_Trend_Icon_2'
+    elseif CS.Utility.GetLogicAndValue(roundResult, WIN_CODE.HE) == WIN_CODE.HE then
+        return 'sprite_Trend_Icon_4'
     else
         return 'sprite_Trend_Icon_1'
     end
 end
 
 function GetTrend2IconNameByValue(value)
-    if CS.Utility.GetLogicAndValue(value, WIN_CODE.LONG_WIN) == WIN_CODE.LONG_WIN then
+    if CS.Utility.GetLogicAndValue(value, WIN_CODE.LONG) == WIN_CODE.LONG then
         return 'sprite_hong'
-    elseif CS.Utility.GetLogicAndValue(value, WIN_CODE.HU_WIN) == WIN_CODE.HU_WIN then
+    elseif CS.Utility.GetLogicAndValue(value, WIN_CODE.HU) == WIN_CODE.HU then
         return 'sprite_lan'
+    elseif CS.Utility.GetLogicAndValue(value, WIN_CODE.HE) == WIN_CODE.HE then
+        return 'sprite_lv'
     else
         return 'sprite_lv'
     end
@@ -329,9 +339,11 @@ end
 
 -- 获取更新的值
 function GetTrend2UpdateValue(value)
-    if CS.Utility.GetLogicAndValue(value, WIN_CODE.LONG_WIN) == WIN_CODE.LONG_WIN then
-        return WIN_CODE.LONG_WIN
-    elseif CS.Utility.GetLogicAndValue(value, WIN_CODE.HU_WIN) == WIN_CODE.HU_WIN then
-        return WIN_CODE.HU_WIN
+    if CS.Utility.GetLogicAndValue(value, WIN_CODE.LONG) == WIN_CODE.LONG then
+        return WIN_CODE.LONG
+    elseif CS.Utility.GetLogicAndValue(value, WIN_CODE.HU) == WIN_CODE.HU then
+        return WIN_CODE.HU
+    else
+        return WIN_CODE.HE
     end
 end

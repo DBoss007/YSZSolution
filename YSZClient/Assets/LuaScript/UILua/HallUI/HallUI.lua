@@ -3,24 +3,25 @@
 local RoomType1Offset = 0
 -- 房间类型2(试水厅) 偏移量
 local RoomType2Offset = 200
+-- 聚龙厅房间列表
+local mJuLongRooms = { }
 
 local IsUpDate = true
 
 function Awake()
+    this.transform:Find('Canvas/RoleInfo/Gold/Icon'):GetComponent("Button").onClick:AddListener(AddGoldButtonOnClick)
+    this.transform:Find('Canvas/RoleInfo/RoomCard/Icon'):GetComponent("Button").onClick:AddListener(AddRoomCardButtonOnClick)
+    this.transform:Find('Canvas/RoleInfo/Diamond/Icon'):GetComponent("Button").onClick:AddListener(AddDiamondButton_OnClick)
+    this.transform:Find('Canvas/RoleInfo/RoleIcon'):GetComponent("Button").onClick:AddListener(HallUI_HeadIconOnClick)
     -- 注册区域功能区域按钮
     this.transform:Find('Canvas/Bottom/ButtonStore'):GetComponent("Button").onClick:AddListener(StoreButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonMail'):GetComponent("Button").onClick:AddListener(MailButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonRank'):GetComponent("Button").onClick:AddListener(RankButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonSetting'):GetComponent("Button").onClick:AddListener(SettingButtonOnClick)
-    this.transform:Find('Canvas/DetailInfo/Panel1/Statistics/StatisticsLeft'):GetComponent("ScrollRectExtend2").onClick:AddListener(EnterSelectedGameRoom)
-    this.transform:Find('Canvas/DetailInfo/Panel1/Statistics/StatisticsRight'):GetComponent("ScrollRectExtend2").onClick:AddListener(EnterSelectedGameRoom)
-    this.transform:Find('Canvas/DetailInfo/Panel2/Content/CreateRoom'):GetComponent("Button").onClick:AddListener(CreateVipRoomButtonOnClick)
-    this.transform:Find('Canvas/DetailInfo/Panel2/Content/JoinRoom'):GetComponent("Button").onClick:AddListener(JoinVipRoomButtonOnClick)
-    this.transform:Find('Canvas/RoleInfo/Gold/Icon'):GetComponent("Button").onClick:AddListener(AddGoldButtonOnClick)
-    this.transform:Find('Canvas/RoleInfo/RoomCard/Icon'):GetComponent("Button").onClick:AddListener(AddRoomCardButtonOnClick)
-    this.transform:Find('Canvas/RoleInfo/Diamond/Icon'):GetComponent("Button").onClick:AddListener(AddDiamondButton_OnClick)
-    this.transform:Find('Canvas/RoleInfo/RoleIcon'):GetComponent("Button").onClick:AddListener(HallUI_HeadIconOnClick)
-    this.transform:Find('Canvas/Shishuiting/RoomCards/RoomInfo1'):GetComponent("Button").onClick:AddListener(EnterSelectedGameRoom)
+
+    this.transform:Find('Canvas/Room2/Room2DetailInfo/Panel2/Content/CreateRoom'):GetComponent("Button").onClick:AddListener(CreateVipRoomButtonOnClick)
+    this.transform:Find('Canvas/Room2/Room2DetailInfo/Panel2/Content/JoinRoom'):GetComponent("Button").onClick:AddListener(JoinVipRoomButtonOnClick)
+
     this.transform:Find('Canvas/Center/Room1'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(1) end)
     this.transform:Find('Canvas/Center/Room2'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(2) end)
     this.transform:Find('Canvas/Center/Room3'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(3) end)
@@ -229,6 +230,7 @@ function InitHallUIRoomTypeInfo()
 
     for index = 1, 7, 1 do
         local roomInfoItem = roomRoot:Find('Room3Info' .. index)
+        mJuLongRooms[index] = roomInfoItem
         local roomConfig = data.RoomConfig[index]
         if roomConfig ~= nil then
             roomInfoItem.gameObject:SetActive(true)
@@ -238,6 +240,7 @@ function InitHallUIRoomTypeInfo()
             for roomType = 1, 5, 1 do
                 roomInfoItem:Find('back/RoomID/RoomType/RoomType' .. roomType).gameObject:SetActive(roomConfig.Type == roomType)
             end
+            
         else
             roomInfoItem.gameObject:SetActive(false)
         end
@@ -309,7 +312,7 @@ function HandleRoomTypeChanged(roomType)
     elseif roomType == 2 then
         HandleRoomTypeChangedToShishuiting(index)
     elseif roomType == 3 then
-        HandleRoomTypeChangedToVipting(index)
+        HandleRoomTypeChangedToJuLongting(index)
     end
 
     -- TryShowGuideOfRoomType(roomType)
@@ -321,10 +324,10 @@ function HandleRoomTypeChangedToShishuiting(roomID)
     RefreshDetailPanel1InfoByRoomInfo(2, roomID)
 end
 
--- 进入Vip 厅
-function HandleRoomTypeChangedToVipting(vipType)
-    HandleViptingVipTypeChanged(vipType)
-    this.transform:Find('Canvas/Vipting/VipTypes'):GetComponent("CoverFlow"):ResetCenterItem(vipType - 1)
+-- 进入聚龙厅
+function HandleRoomTypeChangedToJuLongting(vipType)
+    --NetMsgHandler.Send_CS_Request_Statistics(...)
+    NetMsgHandler.Send_CS_Request_Statistics(1,2,3,4,5,6,7)
 end
 
 -- 进入搓牌厅
@@ -337,15 +340,6 @@ function HandleRoomTypeChangedToJingmiting(roomID)
     end
 end
 
--- 搓牌厅 轮盘选中变化通知
-function JingmitingRoomInfo_OnValueChanged(selected, roomConfig)
-    if selected == true then
-        GameData.HallData.Data[1] = roomConfig.TemplateID
-        HandleJingmitingRoomCardChanged(roomConfig.TemplateID)
-        -- 音效:轮盘选中
-        MusicMgr:PlaySoundEffect(11)
-    end
-end
 
 -- 搓牌厅 选中房间变化
 function HandleJingmitingRoomCardChanged(roomID)
@@ -411,23 +405,21 @@ end
 -- 搓牌厅 刷新详细信息部分的房间人数
 function HandleUpdateStatisticsInfo(eventArgs)
     -- 当前选择类型是竞咪厅
-    if GameData.HallData.SelectType == 1 then
-        local roomID = GameData.HallData.Data[GameData.HallData.SelectType]
-        if eventArgs.RoomID == roomID then
-            TryRefreshRoomOnlineRoleCount(roomID)
-        end
-    end
+    local RoomID = eventArgs.RoomID
+    TryRefreshRoomOnlineRoleCount(RoomID)
 end
 
 -- 搓牌厅 尝试刷新在线人数
 function TryRefreshRoomOnlineRoleCount(roomID)
     local statistics = GameData.RoomInfo.StatisticsInfo[roomID]
     local roleCount = 0
-    if statistics ~= nil then
+    if statistics ~= nil and mJuLongRooms[roomID] ~= nil then
+        -- 刷新房间路单信息
+        local trendScrpit = mJuLongRooms[roomID]:Find('back/HallUIStatisticsAreaHandle'):GetComponent("LuaBehaviour").LuaScript
+		trendScrpit.ResetRelativeRoomID(roomID)
         roleCount = statistics.Counts.RoleCount
+        mJuLongRooms[roomID]:Find('back/RoleCount/Value'):GetComponent('Text').text = tostring(roleCount)
     end
-    local roleCountText = this.transform:Find('Canvas/DetailInfo/Panel1/RoleCount/Value'):GetComponent("Text")
-    roleCountText.text = tostring(roleCount)
 end
 
 -- VIP 厅数据刷新
@@ -437,28 +429,6 @@ function ViptingRoomType_OnValueChanged(selected, vipType)
         HandleViptingVipTypeChanged(vipType)
         -- 音效:轮盘选中
         MusicMgr:PlaySoundEffect(11)
-    end
-end
-
--- VIP 厅数据变化
-function HandleViptingVipTypeChanged(vipType)
-    this.transform:Find('Canvas/Vipting/PageIndex/Value'):GetComponent("Text").text = "<size=72>" .. vipType .. "</size>/3"
-    RefreshDetailPanel2InfoByVipType(vipType)
-end
-
--- VIP 厅刷新Bottom信息
-function RefreshDetailPanel2InfoByVipType(vipType)
-    local detailPanel2 = this.transform:Find('Canvas/DetailInfo/Panel2')
-    for index = 1, 3, 1 do
-        detailPanel2:Find('VipType/Value' .. index).gameObject:SetActive(index == vipType)
-    end
-
-    detailPanel2:Find('Content/Tips').gameObject:SetActive(vipType ~= 1)
-    detailPanel2:Find('Content/CreateRoom').gameObject:SetActive(vipType == 1)
-    detailPanel2:Find('Content/JoinRoom').gameObject:SetActive(vipType == 1)
-    detailPanel2:Find('Content/RelativeRooms').gameObject:SetActive(vipType == 1)
-    if vipType == 1 then
-        NetMsgHandler.Send_CS_Request_Relative_Room()
     end
 end
 
