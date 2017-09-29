@@ -1,0 +1,83 @@
+2017-09-21 15:07:37.264 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-21 15:07:37.265 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-21 15:07:37.890 LOG_INFO  Client Connect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:106
+2017-09-21 15:07:38.915 LOG_INFO  Client Connect Server: SocketID:2341481157, Remote Address: 127.0.0.1|20000 netclient.cpp:106
+2017-09-21 15:07:40.931 LOG_INFO  ◤注册每日十一点更新计时器, 间隔71540秒 ◥ scriptlua.cpp:360
+2017-09-21 15:07:40.931 LOG_INFO  ◤注册每日零点更新计时器, 间隔31939秒 ◥ scriptlua.cpp:360
+2017-09-21 15:07:40.931 LOG_INFO  ◤ GC -> Before Use Memory:6.10M ◥ scriptlua.cpp:360
+2017-09-21 15:07:40.950 LOG_INFO  ◤ GC -> After  Use Memory:3.28M ◥ scriptlua.cpp:360
+2017-09-21 15:07:44.475 LOG_INFO  -----------> Connection Server Failed: 127.0.0.1|10000 netclient.cpp:183
+2017-09-21 15:07:45.482 LOG_INFO  -----------> Connection Server Failed: 127.0.0.1|20000 netclient.cpp:183
+2017-09-21 16:37:40.035 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-21 16:37:40.036 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-21 16:37:40.826 LOG_INFO  Client Connect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:106
+2017-09-21 16:37:41.855 LOG_INFO  Client Connect Server: SocketID:2341481157, Remote Address: 127.0.0.1|20000 netclient.cpp:106
+2017-09-21 16:37:43.874 LOG_INFO  ◤注册每日十一点更新计时器, 间隔66137秒 ◥ scriptlua.cpp:360
+2017-09-21 16:37:43.875 LOG_INFO  ◤注册每日零点更新计时器, 间隔26536秒 ◥ scriptlua.cpp:360
+2017-09-21 16:37:43.875 LOG_INFO  ◤ GC -> Before Use Memory:6.10M ◥ scriptlua.cpp:360
+2017-09-21 16:37:43.893 LOG_INFO  ◤ GC -> After  Use Memory:3.28M ◥ scriptlua.cpp:360
+2017-09-21 16:37:48.424 LOG_INFO  -----------> Connection Server Failed: 127.0.0.1|20000 netclient.cpp:183
+2017-09-21 16:57:13.657 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-21 16:57:13.658 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-21 16:57:14.117 LOG_INFO  Client Connect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:106
+2017-09-21 16:57:15.143 LOG_INFO  Client Connect Server: SocketID:2341481157, Remote Address: 127.0.0.1|20000 netclient.cpp:106
+2017-09-21 16:57:17.154 LOG_INFO  ◤注册每日十一点更新计时器, 间隔64963秒 ◥ scriptlua.cpp:360
+2017-09-21 16:57:17.155 LOG_INFO  ◤注册每日零点更新计时器, 间隔25362秒 ◥ scriptlua.cpp:360
+2017-09-21 16:57:17.155 LOG_INFO  ◤ GC -> Before Use Memory:6.11M ◥ scriptlua.cpp:360
+2017-09-21 16:57:17.172 LOG_INFO  ◤ GC -> After  Use Memory:3.29M ◥ scriptlua.cpp:360
+2017-09-21 16:57:17.286 LOG_INFO  Server Listening Port: 192.168.2.48|30000  netserver.cpp:88
+2017-09-21 17:08:17.718 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-21 17:08:17.719 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-21 17:08:18.127 LOG_INFO  Client Connect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:106
+2017-09-21 17:08:19.156 LOG_INFO  Client Connect Server: SocketID:2341481157, Remote Address: 127.0.0.1|20000 netclient.cpp:106
+2017-09-21 17:08:21.169 LOG_INFO  ◤注册每日十一点更新计时器, 间隔64299秒 ◥ scriptlua.cpp:360
+2017-09-21 17:08:21.169 LOG_INFO  ◤注册每日零点更新计时器, 间隔24698秒 ◥ scriptlua.cpp:360
+2017-09-21 17:08:21.169 LOG_INFO  ◤ GC -> Before Use Memory:6.11M ◥ scriptlua.cpp:360
+2017-09-21 17:08:21.208 LOG_INFO  ◤ GC -> After  Use Memory:3.29M ◥ scriptlua.cpp:360
+2017-09-21 17:08:21.415 LOG_INFO  Server Listening Port: 192.168.2.48|30000  netserver.cpp:88
+2017-09-21 17:09:30.478 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-21 17:09:30.479 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-21 17:09:31.348 LOG_INFO  Client Connect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:106
+2017-09-21 17:09:32.377 LOG_INFO  Client Connect Server: SocketID:2341481157, Remote Address: 127.0.0.1|20000 netclient.cpp:106
+2017-09-21 17:09:34.385 LOG_INFO  ◤注册每日十一点更新计时器, 间隔64226秒 ◥ scriptlua.cpp:360
+2017-09-21 17:09:34.385 LOG_INFO  ◤注册每日零点更新计时器, 间隔24625秒 ◥ scriptlua.cpp:360
+2017-09-21 17:09:34.385 LOG_INFO  ◤ GC -> Before Use Memory:6.11M ◥ scriptlua.cpp:360
+2017-09-21 17:09:34.396 LOG_INFO  ◤ GC -> After  Use Memory:3.29M ◥ scriptlua.cpp:360
+2017-09-21 17:09:34.512 LOG_INFO  Server Listening Port: 192.168.2.48|30000  netserver.cpp:88
+2017-09-21 17:09:46.641 LOG_ERROR ��Ϣ: ./GameScript/Account/Account.lua:249: attempt to perform arithmetic on a nil value (field 'NOVICE_TIME_FREE_COUNT')
+�ļ�: e:\work\[1]svn\project_z\trunk\server\library\gdk\script\scriptlua.cpp
+����: CScriptLua::Errorlog
+�к�: 327
+ assert.h:46
+2017-09-21 17:09:47.350 LOG_ERROR Send HttpRequest Error:6; URL:http://dhjh.api.changlaith.com/apply.php?id=1000001&pwd=123456&qq=1&wechat=1&phone=1&sid=1 Data: httpclient.cpp:123
+2017-09-21 17:24:10.496 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-21 17:24:10.497 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-21 17:24:13.325 LOG_INFO  Client Connect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:106
+2017-09-21 17:24:14.559 LOG_INFO  Client Connect Server: SocketID:2341481157, Remote Address: 127.0.0.1|20000 netclient.cpp:106
+2017-09-21 17:24:16.636 LOG_INFO  ◤注册每日十一点更新计时器, 间隔63344秒 ◥ scriptlua.cpp:360
+2017-09-21 17:24:16.636 LOG_INFO  ◤注册每日零点更新计时器, 间隔23743秒 ◥ scriptlua.cpp:360
+2017-09-21 17:24:16.636 LOG_INFO  ◤ GC -> Before Use Memory:6.11M ◥ scriptlua.cpp:360
+2017-09-21 17:24:16.749 LOG_INFO  ◤ GC -> After  Use Memory:3.29M ◥ scriptlua.cpp:360
+2017-09-21 17:24:17.866 LOG_INFO  Server Listening Port: 192.168.2.48|30000  netserver.cpp:88
+2017-09-21 17:36:22.479 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-21 17:36:22.480 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-21 17:36:22.925 LOG_INFO  Client Connect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:106
+2017-09-21 17:36:23.949 LOG_INFO  Client Connect Server: SocketID:2341481157, Remote Address: 127.0.0.1|20000 netclient.cpp:106
+2017-09-21 17:36:25.959 LOG_INFO  ◤注册每日十一点更新计时器, 间隔62615秒 ◥ scriptlua.cpp:360
+2017-09-21 17:36:25.960 LOG_INFO  ◤注册每日零点更新计时器, 间隔23014秒 ◥ scriptlua.cpp:360
+2017-09-21 17:36:25.961 LOG_INFO  ◤ GC -> Before Use Memory:6.11M ◥ scriptlua.cpp:360
+2017-09-21 17:36:25.992 LOG_INFO  ◤ GC -> After  Use Memory:3.29M ◥ scriptlua.cpp:360
+2017-09-21 17:36:30.522 LOG_INFO  -----------> Connection Server Failed: 127.0.0.1|20000 netclient.cpp:183
+2017-09-21 17:39:10.908 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-21 17:39:10.909 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-21 17:39:11.352 LOG_INFO  Client Connect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:106
+2017-09-21 17:39:12.380 LOG_INFO  Client Connect Server: SocketID:2341481157, Remote Address: 127.0.0.1|20000 netclient.cpp:106
+2017-09-21 17:39:14.388 LOG_INFO  ◤注册每日十一点更新计时器, 间隔62446秒 ◥ scriptlua.cpp:360
+2017-09-21 17:39:14.388 LOG_INFO  ◤注册每日零点更新计时器, 间隔22845秒 ◥ scriptlua.cpp:360
+2017-09-21 17:39:14.388 LOG_INFO  ◤ GC -> Before Use Memory:6.11M ◥ scriptlua.cpp:360
+2017-09-21 17:39:14.399 LOG_INFO  ◤ GC -> After  Use Memory:3.29M ◥ scriptlua.cpp:360
+2017-09-21 17:39:18.964 LOG_INFO  -----------> Connection Server Failed: 127.0.0.1|20000 netclient.cpp:183
+2017-09-21 17:39:28.270 LOG_INFO  Server Listening Port: 192.168.2.48|30000  netserver.cpp:88
+2017-09-21 18:31:21.768 LOG_INFO  From Server Connection Closed, Remote Address:127.0.0.1|10000, SocketID:211831992 netclient.cpp:223
+2017-09-21 18:31:21.769 LOG_INFO  Client ReConnect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:60
+2017-09-21 18:31:28.333 LOG_INFO  -----------> Connection Server Failed: 127.0.0.1|10000 netclient.cpp:183

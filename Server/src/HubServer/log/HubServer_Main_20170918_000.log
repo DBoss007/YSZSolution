@@ -1,0 +1,20 @@
+2017-09-18 17:52:36.544 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-18 17:52:36.551 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-18 17:52:36.695 LOG_ERROR ÐÅÏ¢: cannot open ./HubScript/Config/server.lua: No such file or directory
+ÎÄ¼þ: e:\work\[1]svn\project_z\trunk\server\library\gdk\script\scriptlua.cpp
+º¯Êý: CScriptLua::Errorlog
+ÐÐºÅ: 327
+ assert.h:46
+2017-09-18 17:54:01.797 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-18 17:54:01.798 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-18 17:54:01.807 LOG_ERROR ÐÅÏ¢: cannot open ./HubScript/Config/server.lua: No such file or directory
+ÎÄ¼þ: e:\work\[1]svn\project_z\trunk\server\library\gdk\script\scriptlua.cpp
+º¯Êý: CScriptLua::Errorlog
+ÐÐºÅ: 327
+ assert.h:46
+2017-09-18 17:58:15.260 LOG_ALARM -----------------  log4z thread started!   ---------------------------- log4z.cpp:1786
+2017-09-18 17:58:15.262 LOG_ALARM logger id=0 key=Main name=Main path=./log/ level=2 display=true log4z.cpp:1796
+2017-09-18 17:58:15.671 LOG_INFO  Client Connect Server: SocketID:211831992, Remote Address: 127.0.0.1|10000 netclient.cpp:106
+2017-09-18 17:58:16.713 LOG_INFO  â—¤ GC -> Before Use Memory:0.13M â—¥ scriptlua.cpp:360
+2017-09-18 17:58:16.714 LOG_INFO  â—¤ GC -> After  Use Memory:0.08M â—¥ scriptlua.cpp:360
+2017-09-18 17:58:22.255 LOG_INFO  -----------> Connection Server Failed: 127.0.0.1|10000 netclient.cpp:183

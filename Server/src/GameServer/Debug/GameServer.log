@@ -1,0 +1,94 @@
+﻿  Base64.cpp
+  HMacSha1.cpp
+  MD5.cpp
+  SHA1.cpp
+  Command.cpp
+  DataBase.cpp
+  Field.cpp
+  QueryResult.cpp
+  MsgQueue.cpp
+  Formula.cpp
+  HttpClient.cpp
+  Json.cpp
+  log4z.cpp
+  Packet.cpp
+  PacketPool.cpp
+  MeshPath.cpp
+  NavMesh.cpp
+  ScriptLua.cpp
+  ScriptPython.cpp
+  NetClient.cpp
+  NetServer.cpp
+  StatisticsMgr.cpp
+  StringFilter.cpp
+  Thread.cpp
+  TimerMgr.cpp
+  TimerWheel.cpp
+  Xml.cpp
+  GameServer.cpp
+  BackstageMgr.cpp
+  ServerCommend.cpp
+  ThreadWatch.cpp
+  World.cpp
+Base64.obj : warning LNK4075: 忽略“/EDITANDCONTINUE”(由于“/SAFESEH”规范)
+libraknet.lib(BitStream.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(BitStream.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(CCRakNetSlidingWindow.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(CCRakNetSlidingWindow.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(DR_SHA1.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(DR_SHA1.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(DS_ByteQueue.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(DS_ByteQueue.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(DS_HuffmanEncodingTree.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(DS_HuffmanEncodingTree.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(GetTime.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(GetTime.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(Itoa.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(Itoa.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(LocklessTypes.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(LocklessTypes.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(PluginInterface2.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(PluginInterface2.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(RakMemoryOverride.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(RakMemoryOverride.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(RakNetSocket2.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(RakNetSocket2.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(RakNetStatistics.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(RakNetStatistics.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(RakNetTypes.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(RakNetTypes.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(RakPeer.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(RakPeer.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(RakSleep.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(RakSleep.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(RakString.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(RakString.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(RakThread.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(RakThread.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(Rand.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(Rand.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(ReliabilityLayer.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(ReliabilityLayer.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(SignaledEvent.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(SignaledEvent.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(SimpleMutex.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(SimpleMutex.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(SocketLayer.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(SocketLayer.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(StringCompressor.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(StringCompressor.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(StringTable.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(StringTable.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(SuperFastHash.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(SuperFastHash.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(TCPInterface.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(TCPInterface.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+libraknet.lib(WSAStartupSingleton.obj) : warning LNK4099: 未找到 PDB“RakNet_VS2008_LibStatic_Debug_Win32.pdb”(使用“libraknet.lib(WSAStartupSingleton.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\RakNet_VS2008_LibStatic_Debug_Win32.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lapi.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lapi.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lauxlib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lauxlib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lbaselib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lbaselib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lcode.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lcode.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lcorolib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lcorolib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lctype.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lctype.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(ldblib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(ldblib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(ldebug.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(ldebug.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(ldo.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(ldo.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(ldump.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(ldump.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lfunc.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lfunc.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lgc.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lgc.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(linit.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(linit.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(liolib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(liolib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(llex.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(llex.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lmathlib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lmathlib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lmem.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lmem.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(loadlib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(loadlib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lobject.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lobject.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lopcodes.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lopcodes.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(loslib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(loslib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lparser.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lparser.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lstate.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lstate.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lstring.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lstring.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lstrlib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lstrlib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(ltable.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(ltable.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(ltablib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(ltablib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(ltm.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(ltm.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lundump.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lundump.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lutf8lib.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lutf8lib.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lvm.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lvm.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lua.lib(lzio.obj) : warning LNK4099: 未找到 PDB“lua.pdb”(使用“lua.lib(lzio.obj)”或在“E:\Work\[1]SVN\Project_Z\trunk\Server\bin\Win32_Debug\lua.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+  GameServer.vcxproj -> E:\Work\[1]SVN\Project_Z\trunk\Server\src\GameServer\..\..\bin\Win32_Debug\GameServer.exe
+  GameServer.vcxproj -> ..\..\bin\Win32_Debug\GameServer.pdb (Full PDB)
