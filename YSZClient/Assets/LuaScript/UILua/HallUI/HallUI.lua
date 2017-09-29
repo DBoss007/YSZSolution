@@ -19,8 +19,8 @@ function Awake()
     this.transform:Find('Canvas/Bottom/ButtonRank'):GetComponent("Button").onClick:AddListener(RankButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonSetting'):GetComponent("Button").onClick:AddListener(SettingButtonOnClick)
 
-    this.transform:Find('Canvas/Room2/Room2DetailInfo/Panel2/Content/CreateRoom'):GetComponent("Button").onClick:AddListener(CreateVipRoomButtonOnClick)
-    this.transform:Find('Canvas/Room2/Room2DetailInfo/Panel2/Content/JoinRoom'):GetComponent("Button").onClick:AddListener(JoinVipRoomButtonOnClick)
+    this.transform:Find('Canvas/Room3/Room2DetailInfo/Panel2/Content/CreateRoom'):GetComponent("Button").onClick:AddListener(CreateVipRoomButtonOnClick)
+    this.transform:Find('Canvas/Room3/Room2DetailInfo/Panel2/Content/JoinRoom'):GetComponent("Button").onClick:AddListener(JoinVipRoomButtonOnClick)
 
     this.transform:Find('Canvas/Center/Room1'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(1) end)
     this.transform:Find('Canvas/Center/Room2'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(2) end)
@@ -48,8 +48,6 @@ function WindowOpened()
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.UpdateStatistics, HandleUpdateStatisticsInfo)
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.UpdateUnHandleFlag, HandleUpdateUnHandleFlagEvent)
     HandleRoomTypeChanged(GameData.HallData.SelectType)
-
-    TryShowInputInviteCodeTips()
 end
 
 function WindowClosed()
@@ -225,11 +223,11 @@ end
 -- 初始化房间基础信息
 function InitHallUIRoomTypeInfo()
 
-    -- 初始化竞咪厅信息
-    local roomRoot = this.transform:Find('Canvas/Room3/Room3Content/Viewport/Content')
+    -- 初始化聚龙厅房间
+    local roomRoot = this.transform:Find('Canvas/Room1/Room1Content/Viewport/Content')
 
     for index = 1, 7, 1 do
-        local roomInfoItem = roomRoot:Find('Room3Info' .. index)
+        local roomInfoItem = roomRoot:Find('Room1Info' .. index)
         mJuLongRooms[index] = roomInfoItem
         local roomConfig = data.RoomConfig[index]
         if roomConfig ~= nil then
@@ -240,63 +238,11 @@ function InitHallUIRoomTypeInfo()
             for roomType = 1, 5, 1 do
                 roomInfoItem:Find('back/RoomID/RoomType/RoomType' .. roomType).gameObject:SetActive(roomConfig.Type == roomType)
             end
-            
         else
             roomInfoItem.gameObject:SetActive(false)
         end
     end
-
-    for index = 1, 3, 1 do
-        local vipTypeItem = this.transform:Find('Canvas/Vipting/VipTypes/VipType' .. index)
-        vipTypeItem:GetComponent("CoverFlowItem"):OnValueChanged('+',( function(selected) ViptingRoomType_OnValueChanged(selected, index) end))
-    end
 end
-
-function RefreshRoomList3()
-    -- body
-    local roomDatas = GetRoomConfigDatasByTab(TabType.CUOPAI)
-    local roomItemParent = this.transform:Find('Canvas/Panel_List/RoomList_1/Viewport/Content')
-    local i = 1
-    RoomUI = { }
-    for key, roomData in ipairs(roomDatas) do
-        if i > roomItemParent.childCount - 1 then return end
-        local roomItemUI = roomItemParent:GetChild(i)
-        roomItemUI.gameObject:SetActive(true)
-        ResetRoomListItem(roomItemUI, roomData)
-        i = i + 1
-    end
-    local maxRoomNum = GetMaxRoomNum()
-    for i = #roomDatas + 1, roomItemParent.childCount - 1 do
-        local roomItemUI = roomItemParent:GetChild(i)
-        roomItemUI.gameObject:SetActive(false)
-    end
-end
-
-function GetRoomConfigDatasByTab(tab)
-    local roomDatas = { }
-    local upperLimit = 0
-    local lowerLimit = 0
-    if tab == TabType.CUOPAI then
-        lowerLimit = 101
-        upperLimit = 199
-    elseif tab == TabType.JUNIU then
-        lowerLimit = 201
-        upperLimit = 299
-    end
-    if data.RoomConfig then
-        for k, roomData in pairs(data.RoomConfig) do
-            if roomData.TemplateID >= lowerLimit and roomData.TemplateID <= upperLimit then
-                table.insert(roomDatas, roomData)
-            end
-        end
-    end
-
-    table.sort(roomDatas, function(lhs, rhs)
-        return lhs.TemplateID < rhs.TemplateID
-    end )
-    return roomDatas
-end	
-
 
 -- 房间类型改变刷新
 function HandleRoomTypeChanged(roomType)
@@ -308,127 +254,43 @@ function HandleRoomTypeChanged(roomType)
     print('RoomType:' .. roomType)
     -- 刷新细节
     if roomType == 1 then
-        HandleRoomTypeChangedToJingmiting(index)
+        HandleRoomTypeChangedToJuLongting()
     elseif roomType == 2 then
-        HandleRoomTypeChangedToShishuiting(index)
+        HandleRoomTypeChangedToJingDianting()
     elseif roomType == 3 then
-        HandleRoomTypeChangedToJuLongting(index)
+        HandleRoomTypeChangedToZuJuting()
     end
-
     -- TryShowGuideOfRoomType(roomType)
 end
 
--- 进入试水厅
-function HandleRoomTypeChangedToShishuiting(roomID)
+-- 聚龙厅
+function HandleRoomTypeChangedToJuLongting()
+    -- NetMsgHandler.Send_CS_Request_Statistics(...)
+    NetMsgHandler.Send_CS_Request_Statistics(1, 2, 3, 4, 5, 6, 7)
+end
+
+-- 金典厅
+function HandleRoomTypeChangedToJingDianting()
     -- 免费试玩房间仅有一个，故不需要选项卡切换来请求数据
-    RefreshDetailPanel1InfoByRoomInfo(2, roomID)
 end
 
--- 进入聚龙厅
-function HandleRoomTypeChangedToJuLongting(vipType)
-    --NetMsgHandler.Send_CS_Request_Statistics(...)
-    NetMsgHandler.Send_CS_Request_Statistics(1,2,3,4,5,6,7)
-end
-
--- 进入搓牌厅
-function HandleRoomTypeChangedToJingmiting(roomID)
+-- 组局厅
+function HandleRoomTypeChangedToZuJuting()
     -- 传入的序号从 0开始的：计算方式（房间ID - 房间类型偏移量 - 1）
-    if GameData.HallData.Data[1] == roomID then
-        if data.RoomConfig[roomID] ~= nil then
-            HandleJingmitingRoomCardChanged(data.RoomConfig[roomID].TemplateID)
-        end
-    end
+
 end
 
-
--- 搓牌厅 选中房间变化
-function HandleJingmitingRoomCardChanged(roomID)
-    this.transform:Find('Canvas/Jingmiting/PageIndex/Value'):GetComponent("Text").text = "<size=72>" .. roomID - RoomType1Offset .. "</size>/7"
-    RefreshDetailPanel1InfoByRoomInfo(1, roomID)
-end
-
--- 搓牌厅 刷新详细面板1内容
-function RefreshDetailPanel1InfoByRoomInfo(roomType, roomID)
-    local roomDetail = this.transform:Find('Canvas/DetailInfo/Panel1')
-    local roomConfig = data.RoomConfig[roomID]
-    if roomConfig ~= nil then
-        roomDetail:Find('RoomID/Value'):GetComponent("Text").text = roomConfig.ShowName
-        RefreshDetailPanel1InfoOfRoomType(roomID)
-        if roomType == 1 then
-            roomDetail:Find('RoleCount').gameObject:SetActive(true)
-            TryRefreshRoomOnlineRoleCount(roomID)
-            roomDetail:Find('LeftCount').gameObject:SetActive(false)
-        else
-            roomDetail:Find('RoleCount').gameObject:SetActive(false)
-            roomDetail:Find('LeftCount').gameObject:SetActive(true)
-            if GameData.RoleInfo.FreePlayTimes < 0 then
-                roomDetail:Find('LeftCount/Value'):GetComponent("Text").text = "不限"
-            else
-                roomDetail:Find('LeftCount/Value'):GetComponent("Text").text = tostring(GameData.RoleInfo.FreePlayTimes)
-            end
-        end
-    end
-
-    -- 每次均请求单个的房间数据
-    NetMsgHandler.Send_CS_Request_Statistics(roomID)
-
-    local trendScrpit = this.transform:Find('Canvas/DetailInfo/Panel1/Statistics'):GetComponent("LuaBehaviour").LuaScript
-    trendScrpit.ResetRelativeRoomID(roomID)
-end
-
--- 搓牌厅 刷新详细面板1的房间类型
-function RefreshDetailPanel1InfoOfRoomType(roomID)
-    local roomTypeRoot = this.transform:Find('Canvas/DetailInfo/Panel1/RoomID/RoomType')
-    if roomID < RoomType1Offset + 4 then
-        roomTypeRoot:Find('RoomType1').gameObject:SetActive(true)
-        roomTypeRoot:Find('RoomType2').gameObject:SetActive(false)
-        roomTypeRoot:Find('RoomType3').gameObject:SetActive(false)
-        roomTypeRoot:Find('RoomType4').gameObject:SetActive(false)
-    elseif roomID < RoomType1Offset + 7 then
-        roomTypeRoot:Find('RoomType1').gameObject:SetActive(false)
-        roomTypeRoot:Find('RoomType2').gameObject:SetActive(true)
-        roomTypeRoot:Find('RoomType3').gameObject:SetActive(false)
-        roomTypeRoot:Find('RoomType4').gameObject:SetActive(false)
-    elseif roomID == RoomType1Offset + 7 then
-        roomTypeRoot:Find('RoomType1').gameObject:SetActive(false)
-        roomTypeRoot:Find('RoomType2').gameObject:SetActive(false)
-        roomTypeRoot:Find('RoomType3').gameObject:SetActive(true)
-        roomTypeRoot:Find('RoomType4').gameObject:SetActive(false)
-    elseif roomID > RoomType2Offset then
-        roomTypeRoot:Find('RoomType1').gameObject:SetActive(false)
-        roomTypeRoot:Find('RoomType2').gameObject:SetActive(false)
-        roomTypeRoot:Find('RoomType3').gameObject:SetActive(false)
-        roomTypeRoot:Find('RoomType4').gameObject:SetActive(true)
-    end
-end
-
--- 搓牌厅 刷新详细信息部分的房间人数
+-- 聚龙厅 刷新详细信息部分的房间人数
 function HandleUpdateStatisticsInfo(eventArgs)
-    -- 当前选择类型是竞咪厅
-    local RoomID = eventArgs.RoomID
-    TryRefreshRoomOnlineRoleCount(RoomID)
-end
-
--- 搓牌厅 尝试刷新在线人数
-function TryRefreshRoomOnlineRoleCount(roomID)
+    local roomID = eventArgs.RoomID
     local statistics = GameData.RoomInfo.StatisticsInfo[roomID]
     local roleCount = 0
     if statistics ~= nil and mJuLongRooms[roomID] ~= nil then
         -- 刷新房间路单信息
         local trendScrpit = mJuLongRooms[roomID]:Find('back/HallUIStatisticsAreaHandle'):GetComponent("LuaBehaviour").LuaScript
-		trendScrpit.ResetRelativeRoomID(roomID)
+        trendScrpit.ResetRelativeRoomID(roomID)
         roleCount = statistics.Counts.RoleCount
         mJuLongRooms[roomID]:Find('back/RoleCount/Value'):GetComponent('Text').text = tostring(roleCount)
-    end
-end
-
--- VIP 厅数据刷新
-function ViptingRoomType_OnValueChanged(selected, vipType)
-    if selected == true then
-        GameData.HallData.Data[3] = vipType
-        HandleViptingVipTypeChanged(vipType)
-        -- 音效:轮盘选中
-        MusicMgr:PlaySoundEffect(11)
     end
 end
 
@@ -450,41 +312,6 @@ function UpdateRelationRoomList(param)
     end
 
     this.transform:Find('Canvas/DetailInfo/Panel2/Content/RelativeRooms/Viewport/NoneTip').gameObject:SetActive(isShowNoneTips)
-end
-
--- 显示邀请码填写提示Tips
-function TryShowInputInviteCodeTips()
-
-    if GameData.IsShowInviteBtn == 0 and LoginMgr.RunningPlatformID == 3 then
-        -- 审核版本不能显示此tips
-        return
-    end
-
-    if GameData.IsPromptedInviteTips == false then
-        if GameData.RoleInfo.InviteCode == 0 then
-            -- 弹出设置界面和邀请界面
-            local boxData = CS.MessageBoxData()
-            boxData.Title = "提示"
-            boxData.Content = data.GetString("Input_Invite_Code_Tips")
-            boxData.Style = 2
-            boxData.OKButtonName = "前往"
-            boxData.CancelButtonName = "稍后"
-            boxData.LuaCallBack = InputInviteCodeMessageBoxCallBack
-            local parentWindow = this.WindowNode
-            CS.MessageBoxUI.Show(boxData, parentWindow)
-            GameData.IsPromptedInviteTips = true
-        end
-    end
-end
-
--- 开启邀请填写UI
-function InputInviteCodeMessageBoxCallBack(result)
-    if result == 1 then
-        local settingUI = CS.WindowManager.Instance:OpenWindow("UISetting")
-        local initParam = CS.WindowNodeInitParam("UIInviteCode")
-        initParam.ParentNode = settingUI
-        CS.WindowManager.Instance:OpenWindow(initParam)
-    end
 end
 
 -- 显示(Guide)引导 UI

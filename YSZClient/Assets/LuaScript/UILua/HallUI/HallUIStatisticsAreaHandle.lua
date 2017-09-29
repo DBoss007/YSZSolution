@@ -6,15 +6,15 @@ local m_RelativeRoomID = 0
 -- 右侧统计数据
 local m_Right_LastPos = 0
 local m_Right_LastUpdateValue = 0
-local m_Right_OffsetY = 9
-local m_Right_OffsetX = 20
-local m_Right_DisplayColumnCount = 21
+local m_Right_OffsetY = 6
+local m_Right_OffsetX = 64
+local m_Right_DisplayColumnCount = 19
 local m_Right_TrendTable = { }
 local m_Right_IsDeflected = false
 -- 左侧统计数据
 local m_Left_OffsetY = 5
-local m_Left_OffsetX = 8
-local m_Left_DisplayColumnCount = 8
+local m_Left_OffsetX = 13
+local m_Left_DisplayColumnCount = 9
 
 local m_Right_ItemCount = 0
 local m_Left_ItemCount = 0
@@ -27,12 +27,8 @@ local m_LastHandleRound = 0
 local m_Left_ItemSize = 0
 local m_Right_ItemSize = 0
 
-local m_Right_CurrentMaxDisplayPos = 21
+local m_Right_CurrentMaxDisplayPos = 19
 
-local delayList
-local UpdateIndex
-local IsCanUpdate
-local UpdateGap = 20
 function Awake()
     m_Left_ItemCount = m_Left_OffsetX * m_Left_OffsetY
     m_Right_ItemCount = m_Right_OffsetX * m_Right_OffsetY
@@ -43,32 +39,12 @@ function Awake()
     m_Left_ItemSize = leftGridLayoutGroup.cellSize.x + leftGridLayoutGroup.spacing.x
     local rightGridLayoutGroup = m_Right_StatisticsRoot:GetComponent("GridLayoutGroup")
     m_Right_ItemSize = rightGridLayoutGroup.cellSize.x + rightGridLayoutGroup.spacing.x
-    delayList = { }
-    UpdateIndex = 0
-    IsCanUpdate = true
+
     CreateStatisticsTrendItems(m_Left_StatisticsRoot, m_Left_ItemCount, m_Left_OffsetY * m_Left_DisplayColumnCount)
     CreateStatisticsTrendItems(m_Right_StatisticsRoot, m_Right_ItemCount, m_Right_OffsetY * m_Right_DisplayColumnCount)
-    isInited = false
+    isInited = true
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.UpdateStatistics, HandleUpdateStatisticsInfo)
-end
-
-function Update()
-    if not IsCanUpdate then
-        return
-    end
-    if delayList[UpdateIndex + UpdateGap] then
-        for i = 1, UpdateGap do
-            delayList[UpdateIndex + i]()
-        end
-        UpdateIndex = UpdateIndex + UpdateGap
-    else
-        for i = UpdateIndex + 1, #delayList do
-            delayList[i]()
-        end
-        isInited = true
-        ResetRelativeRoomID(m_RelativeRoomID)
-        IsCanUpdate = false
-    end
+    ResetRelativeRoomID(m_RelativeRoomID)
 end
 
 function OnDestroy()
@@ -105,18 +81,19 @@ function HandleUpdateStatisticsInfo(eventArgs)
     end
 end
 
-
 -- 创建统计趋势的元素
 function CreateStatisticsTrendItems(trendParent, childCount, displayCount)
     local roundItem = trendParent:GetChild(0)
     roundItem.gameObject:SetActive(false)
     lua_Transform_ClearChildren(trendParent, true)
     for index = 1, childCount, 1 do
-        delayList[#delayList + 1] = function(...)
-            local instanceItem = CS.UnityEngine.Object.Instantiate(roundItem)
-            instanceItem.gameObject.name = 'Item (' .. tostring(index .. ')')
-            CS.Utility.ReSetTransform(instanceItem, trendParent)
+        local instanceItem = CS.UnityEngine.Object.Instantiate(roundItem)
+        instanceItem.gameObject.name = 'Item' .. tostring(index)
+        CS.Utility.ReSetTransform(instanceItem, trendParent)
+        if index > displayCount then
             instanceItem.gameObject:SetActive(false)
+        else
+            instanceItem.gameObject:SetActive(true)
         end
     end
 end
@@ -138,7 +115,7 @@ function AppendStatisticsInfo(statistics)
         if m_LastHandleRound < statistics.Round.CurrentRound then
             -- 刷新左侧的统计图
             for roundIndex = m_LastHandleRound + 1, math.ceil(statistics.Round.CurrentRound / m_Left_OffsetY) * m_Left_OffsetY, 1 do
-                local roundItem = m_Left_StatisticsRoot:Find('Item (' .. roundIndex .. ')')
+                local roundItem = m_Left_StatisticsRoot:Find('Item' .. roundIndex)
                 SetTrendItemResult(roundItem, statistics.Trend[roundIndex])
             end
             -- 刷新右侧的统计图
@@ -170,7 +147,7 @@ function RefreshLeftStatisticsTrendByStatistics(statistics)
         displayCount = m_Left_DisplayColumnCount * m_Left_OffsetY
     end
     for roundIndex = 1, m_Left_ItemCount, 1 do
-        local roundItem = m_Left_StatisticsRoot:Find('Item (' .. roundIndex .. ')')
+        local roundItem = m_Left_StatisticsRoot:Find('Item' .. roundIndex)
         if roundIndex > displayCount then
             roundItem.gameObject:SetActive(false)
         else
@@ -207,8 +184,7 @@ function RefreshRightStatisticsTrendByStatistics(statistics)
     local initDisplayCount = m_Right_DisplayColumnCount * m_Right_OffsetY
     m_Right_CurrentMaxDisplayPos = initDisplayCount
     for index = 1, m_Right_ItemCount, 1 do
-        local trendItem = m_Right_StatisticsRoot:Find('Item (' .. index .. ')')
-        trendItem.gameObject:SetActive(true)
+        local trendItem = m_Right_StatisticsRoot:Find('Item' .. index)
         if index > initDisplayCount then
             trendItem.gameObject:SetActive(false)
         end
@@ -224,21 +200,17 @@ function RefreshRightStatisticsTrendByStatistics(statistics)
 end
 
 function ResetStatisticsRootToRightVisible(roundCount)
-    --local leftScrollRect = this.transform:Find('StatisticsLeft'):GetComponent("ScrollRect")
-    --leftScrollRect.enabled = false
     local leftDisplayCount = math.max(math.ceil(roundCount / m_Left_OffsetY), m_Left_DisplayColumnCount)
     local leftPosX = m_Left_StatisticsRoot.parent.rect.size.x - leftDisplayCount * m_Left_ItemSize
     local leftLocalPos = m_Left_StatisticsRoot.localPosition
     leftLocalPos.x = leftPosX
-    --leftScrollRect.enabled = true
+    m_Left_StatisticsRoot.localPosition = leftLocalPos
 
-    --local rightScrollRect = this.transform:Find('StatisticsRight'):GetComponent("ScrollRect")
-    --rightScrollRect.enabled = false
     local rightDisplayCount = math.max(math.ceil(m_Right_CurrentMaxDisplayPos / m_Right_OffsetY))
     local rightPosX =(m_Right_StatisticsRoot.parent.rect.size.x - rightDisplayCount * m_Right_ItemSize)
     local rightLocalPos = m_Right_StatisticsRoot.localPosition
     rightLocalPos.x = rightPosX
-    --rightScrollRect.enabled = true
+    m_Right_StatisticsRoot.localPosition = rightLocalPos
 end
 
 -- 追加统计值
@@ -283,22 +255,18 @@ function AppendRightStatisticsTrendValue(newValue)
     if m_Right_LastPos > m_Right_DisplayColumnCount * m_Left_OffsetY then
         local columnMax = math.ceil(m_Right_LastPos / m_Right_OffsetY) * m_Right_OffsetY
         for index = columnMax - m_Right_OffsetY, columnMax, 1 do
-            if m_Right_StatisticsRoot:Find('Item (' .. index .. ')') then
-                m_Right_StatisticsRoot:Find('Item (' .. index .. ')').gameObject:SetActive(true)
-            end
+            m_Right_StatisticsRoot:Find('Item' .. index).gameObject:SetActive(true)
         end
     end
     -- 刷新当前最大的显示位置
     m_Right_CurrentMaxDisplayPos = math.max(m_Right_CurrentMaxDisplayPos, m_Right_LastPos)
 
-    local trendItem = m_Right_StatisticsRoot:Find('Item (' .. m_Right_LastPos .. ')')
-    if trendItem then
-        trendItem:Find('ValueIcon'):GetComponent("Image"):ResetSpriteByName(GetTrend2IconNameByValue(newValue))
-        trendItem:Find("ValueIcon").gameObject:SetActive(true)
-        trendItem:Find("BaoZi").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.LONGHUBAOZI) == WIN_CODE.LONGHUBAOZI)
-        trendItem:Find("LongJinHua").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.LONGJINHUA) == WIN_CODE.LONGJINHUA)
-        trendItem:Find("HuJinHua").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.HUJINHUA) == WIN_CODE.HUJINHUA)
-    end
+    local trendItem = m_Right_StatisticsRoot:Find('Item' .. m_Right_LastPos)
+    trendItem:Find('ValueIcon'):GetComponent("Image"):ResetSpriteByName(GetTrend2IconNameByValue(newValue))
+    trendItem:Find("ValueIcon").gameObject:SetActive(true)
+    trendItem:Find("BaoZi").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.LONGHUBAOZI) == WIN_CODE.LONGHUBAOZI)
+    trendItem:Find("LongJinHua").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.LONGJINHUA) == WIN_CODE.LONGJINHUA)
+    trendItem:Find("HuJinHua").gameObject:SetActive(CS.Utility.GetLogicAndValue(newValue, WIN_CODE.HUJINHUA) == WIN_CODE.HUJINHUA)
 end
 
 -- 刷新统计数量相关内容
