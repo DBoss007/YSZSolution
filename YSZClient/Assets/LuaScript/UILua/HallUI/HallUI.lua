@@ -9,11 +9,12 @@ local mJuLongRooms = { }
 local IsUpDate = true
 
 function Awake()
+    -- 玩家信息响应
     this.transform:Find('Canvas/RoleInfo/Gold/Icon'):GetComponent("Button").onClick:AddListener(AddGoldButtonOnClick)
     this.transform:Find('Canvas/RoleInfo/RoomCard/Icon'):GetComponent("Button").onClick:AddListener(AddRoomCardButtonOnClick)
     this.transform:Find('Canvas/RoleInfo/Diamond/Icon'):GetComponent("Button").onClick:AddListener(AddDiamondButton_OnClick)
     this.transform:Find('Canvas/RoleInfo/RoleIcon'):GetComponent("Button").onClick:AddListener(HallUI_HeadIconOnClick)
-    -- 注册区域功能区域按钮
+    -- 底部区域功能区域按钮
     this.transform:Find('Canvas/Bottom/ButtonStore'):GetComponent("Button").onClick:AddListener(StoreButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonMail'):GetComponent("Button").onClick:AddListener(MailButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonRank'):GetComponent("Button").onClick:AddListener(RankButtonOnClick)
@@ -28,6 +29,10 @@ function Awake()
     this.transform:Find('Canvas/Room1/LeftArrow'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(0) end)
     this.transform:Find('Canvas/Room2/LeftArrow'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(0) end)
     this.transform:Find('Canvas/Room3/LeftArrow'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(0) end)
+
+    -- 其他功能响应
+    this.transform:Find('Canvas/Center/BenefitButton'):GetComponent("Button").onClick:AddListener(BenefitButtonOnClick)
+    this.transform:Find('Canvas/Center/SevenDayButton'):GetComponent("Button").onClick:AddListener(SevenDayButtonOnClick)
 
     InitHallUIRoomTypeInfo()
 end
@@ -100,6 +105,8 @@ function EnterGameRoomByRoomID(roomID)
     end
 end
 
+-------------------------------------------------------------------------------
+-------------------------------功能响应模块-------------------------------------
 -- 响应商场按钮点击事件
 function StoreButtonOnClick()
     OpenStoreUI()
@@ -149,6 +156,16 @@ function SettingButtonOnClick()
     CS.WindowManager.Instance:OpenWindow("UISetting")
 end
 
+-- 救济金call
+function BenefitButtonOnClick()
+    print('救济金call')
+end
+
+-- 新人大放送
+function SevenDayButtonOnClick()
+    print('新人大放送call')
+end
+
 -- 响应 创建VIP 房间按钮点击事件
 function CreateVipRoomButtonOnClick()
     CS.WindowManager.Instance:OpenWindow("UICreateRoom", this.WindowNode)
@@ -185,6 +202,8 @@ function AddDiamondButton_OnClick()
     OpenStoreUI()
 end
 
+-------------------------------------------------------------------------------
+-------------------------------角色详细信息模块----------------------------------
 -- 更新角色信息
 function UpdateRoleInfos(param)
     this.transform:Find('Canvas/RoleInfo/RoleName'):GetComponent("Text").text = GameData.RoleInfo.AccountName
