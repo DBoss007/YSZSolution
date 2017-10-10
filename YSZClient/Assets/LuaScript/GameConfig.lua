@@ -1,6 +1,33 @@
 data = { };
 
 
+GameConfig =
+{
+	-- 开发测试阶段可开启 正式版本一定要记住关闭该功能
+    IsDebug = true,
+	
+	IsSelectServer = 0, 	-- 是否启用选择服务器0表示不启用1表示启用，当ipv6的网络环境下此标志位无效
+	CanVisitorLogin = true,	-- 能否游客登陆(该标记位将从hub服务器下发)
+	IsShenHeiVision = false,	-- 是否是审核版本
+
+	--InviteUrl = "http://jhysz.download.changlaith.com/downloadurl/download.php",      --邀请好友一起玩游戏url
+	InviteUrl = "http://jhysz.api.changlaith.com/downpage/main.php",      --邀请好友一起玩游戏url
+	-- 连接的HubServerURL 域名(正式服务器:clysz.hub.changlaith.com 苹果审核域名:jhysz.v10101hub.changlaith.com 本地服务器:192.168.1.3)
+	HubServerURL = "120.77.177.226",
+	GameServerURL = "jhysz.s10.changlaith.com",		-- 链接服务器地址 由服务器下发
+	HubServerPort = 20000,
+	GameServerIP = "",
+	GameServerPort = 30000,
+
+	
+}
+
+-- 性别
+SEX =
+{
+	BOY  			= 1,    	-- 男
+	GIRL 			= 2,    	-- 女
+}
 
 --扑克牌花色定义
 Poker_Type =
@@ -20,28 +47,6 @@ Poker_Type_Define =
 	[Poker_Type.Diamond] = "Diamond",   -- 方块
 }
 
-GameConfig =
-{
-	IsSelectServer = 0, 	-- 是否启用选择服务器0表示不启用1表示启用，当ipv6的网络环境下此标志位无效
-	CanVisitorLogin = true,	-- 能否游客登陆(该标记位将从hub服务器下发)
-	IsShenHeiVision = false,	-- 是否是审核版本
-
-	--InviteUrl = "http://jhysz.download.changlaith.com/downloadurl/download.php",      --邀请好友一起玩游戏url
-	InviteUrl = "http://jhysz.api.changlaith.com/downpage/main.php",      --邀请好友一起玩游戏url
-	-- 连接的HubServerURL 域名(正式服务器:clysz.hub.changlaith.com 苹果审核域名:jhysz.v10101hub.changlaith.com 本地服务器:192.168.1.3)
-	HubServerURL = "120.77.177.226",
-	GameServerURL = "jhysz.s10.changlaith.com",		-- 链接服务器地址 由服务器下发
-	HubServerPort = 20000,
-	GameServerIP = "",
-	GameServerPort = 30000,
-
-	-- 性别
-	SEX =
-	{
-		BOY  			= 1,    	-- 男
-		GIRL 			= 2,    	-- 女
-	},
-}
 
 -- 获取字符串，如果没找到则返回Key
 function data.GetString(strKey)

@@ -1,6 +1,6 @@
-require 'GameConfig';
-require 'GameData';
-require 'Protrocol'
+require 'GameConfig'
+require 'GameData'
+require 'Net/Protrocol'
 
 NetMsgHandler ={};
 
