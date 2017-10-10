@@ -18,8 +18,6 @@ GameConfig =
 	HubServerPort = 20000,
 	GameServerIP = "",
 	GameServerPort = 30000,
-
-	
 }
 
 -- 性别
@@ -45,6 +43,19 @@ Poker_Type_Define =
 	[Poker_Type.Hearts] = "Hearts",    	-- 红桃
 	[Poker_Type.Club] = "Club",      	-- 梅花
 	[Poker_Type.Diamond] = "Diamond",   -- 方块
+}
+
+-- 大厅类型
+HALL_TYPE =
+{
+	-- 大厅中心
+	None = 0,
+    -- 聚龙厅    百人房
+    JuLong = 1,
+    -- 经典厅    五人房
+    JinDian = 2,
+    -- 组局厅    五人房
+    ZuJu = 3,
 }
 
 

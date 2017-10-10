@@ -266,17 +266,17 @@ end
 -- 房间类型改变刷新
 function HandleRoomTypeChanged(roomType)
     local index = GameData.HallData.Data[roomType]
-    this.transform:Find('Canvas/Room1').gameObject:SetActive(roomType == 1)
-    this.transform:Find('Canvas/Room2').gameObject:SetActive(roomType == 2)
-    this.transform:Find('Canvas/Room3').gameObject:SetActive(roomType == 3)
-    this.transform:Find('Canvas/Center').gameObject:SetActive(roomType == 0)
+    this.transform:Find('Canvas/Room1').gameObject:SetActive(roomType == HALL_TYPE.JuLong)
+    this.transform:Find('Canvas/Room2').gameObject:SetActive(roomType == HALL_TYPE.JinDian)
+    this.transform:Find('Canvas/Room3').gameObject:SetActive(roomType == HALL_TYPE.ZuJu)
+    this.transform:Find('Canvas/Center').gameObject:SetActive(roomType == HALL_TYPE.None)
     print('RoomType:' .. roomType)
     -- 刷新细节
-    if roomType == 1 then
+    if roomType == HALL_TYPE.JuLong then
         HandleRoomTypeChangedToJuLongting()
-    elseif roomType == 2 then
+    elseif roomType == HALL_TYPE.JinDian then
         HandleRoomTypeChangedToJingDianting()
-    elseif roomType == 3 then
+    elseif roomType == HALL_TYPE.ZuJu then
         HandleRoomTypeChangedToZuJuting()
     end
     -- TryShowGuideOfRoomType(roomType)
