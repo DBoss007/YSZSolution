@@ -238,7 +238,7 @@ function PaoPaoUIClass.OnClickChatBtn()
 		local nowTime = os.time()
 		if nowTime - PaoPaoUIInstance.coolTime < data.PublicConfig.CHAT_PAOPAO_COOL_TIME then
 			--提示，冷却时间未到
-			CS.BubblePrompt.Show("发言频率太高", "UIGame");
+			CS.BubblePrompt.Show("发言频率太高", "GameUI2");
 		else
 			--显示聊天选择界面
 			if PaoPaoUIInstance.closeChatSelectBtn.gameObject.activeSelf then
@@ -300,7 +300,7 @@ end
 -- 语音录制按钮点击回调
 function PaoPaoUIClass.OnClickYuYinChatBtn()
 	-- body
-	CS.BubblePrompt.Show("语音聊天暂未开放,敬请期待...", "UIGame");
+	CS.BubblePrompt.Show("语音聊天暂未开放,敬请期待...", "GameUI2");
 end
 
 function ShowYuYinChatTipsText( countDown )

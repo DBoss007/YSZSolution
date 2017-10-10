@@ -1,4 +1,5 @@
-GameData = {
+GameData = 
+{
     LoginInfo =
     {
         Account = "",

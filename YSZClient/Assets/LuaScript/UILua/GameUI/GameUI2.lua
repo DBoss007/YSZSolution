@@ -918,7 +918,7 @@ function RefreshBetCountDownOfGameRoomByState(roomState)
 		local countDown = GameData.RoomInfo.CurrentRoom.CountDown
 		-- 开局2秒内进入房间提示已开局，请下注
 		if ROOM_TIME[ROOM_STATE.BET] - countDown < 2 then
-			CS.BubblePrompt.Show(data.GetString("Tip_Start_Bet"), "UIGame")
+			CS.BubblePrompt.Show(data.GetString("Tip_Start_Bet"), "GameUI2")
 			--音效:已开局请下注
 			PlaySoundEffect(35)
 		end
@@ -944,7 +944,7 @@ function UpdateBetCountDown()
 			if ROOM_STATE.BET == GameData.RoomInfo.CurrentRoom.RoomState and countDown > m_BetLimitTime - 0.5 then
 				-- 停止下注提示
 				if countDown > 1 then
-					CS.BubblePrompt.Show(data.GetString("Tip_Stop_Bet"), "UIGame")
+					CS.BubblePrompt.Show(data.GetString("Tip_Stop_Bet"), "GameUI2")
 				end
 				--音效:停止下注
 				PlaySoundEffect(36)
@@ -1698,7 +1698,7 @@ function BetAreaButtonOnClick(areaType)
 			if GameData.RoomInfo.CurrentRoom.SelectBetValue > 0 then
 				NetMsgHandler.Send_CS_Bet(areaType, GameData.RoomInfo.CurrentRoom.SelectBetValue)
 			else
-				CS.BubblePrompt.Show("请选择筹码", "UIGame")
+				CS.BubblePrompt.Show("请选择筹码", "GameUI2")
 			end
 		end
 	end
@@ -1729,7 +1729,7 @@ function HandleNotifyBetResult(eventArgs)
 		if betAreaItem ~= nil then
 			betAreaItem:GetComponent("SwitchAnimation"):Play(1)
 		end
-		CS.BubblePrompt.Show(data.GetString("Bet_Error_" .. eventArgs.ResultType), "UIGame")
+		CS.BubblePrompt.Show(data.GetString("Bet_Error_" .. eventArgs.ResultType), "GameUI2")
 	end
 end
 
@@ -2105,7 +2105,7 @@ end
 
 function HandleSettlementGetGoldShowTip()
 	if GameData.RoomInfo.CurrentRoom.WinGold.NoPayAll == true then
-		CS.BubblePrompt.Show(string.format(data.GetString("Not_Pay_All_Tips"), GameData.RoomInfo.CurrentRoom.BankerInfo.Name), "UIGame")
+		CS.BubblePrompt.Show(string.format(data.GetString("Not_Pay_All_Tips"), GameData.RoomInfo.CurrentRoom.BankerInfo.Name), "GameUI2")
 	end
 	GameData.SyncDisplayGoldCount()
 end
@@ -2320,7 +2320,7 @@ function HideOrShowDeskWord(wordIndex, isActive)
 end
 
 function SitDownButtonOnClick()
-	CS.BubblePrompt.Show("押注龙虎冠军可坐下", "UIGame")
+	CS.BubblePrompt.Show("押注龙虎冠军可坐下", "GameUI2")
 end
 
 function DelayHideInviteLineLight(deltaTime)

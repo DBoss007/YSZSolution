@@ -843,7 +843,7 @@ function NetMsgHandler.Received_CS_Enter_Room(message)
 			GameData.RoomInfo.CurrentRoom.RoomID = message:PopUInt32()
 			GameData.RoomInfo.CurrentRoom.TemplateID = message:PopByte()
 			
-			local openparam = CS.WindowNodeInitParam("UIGame")
+			local openparam = CS.WindowNodeInitParam("GameUI2")
 			openparam.NodeType = 0
 			openparam.LoadComplatedCallBack = function (windowNode)
 				CS.WindowManager.Instance:CloseWindow("HallUI", false)
@@ -871,7 +871,7 @@ function NetMsgHandler.ShowFreeRoomEnterMessageBox()
 			boxData.Content = data.GetString("Tip_Enter_Free_Room")
 			boxData.Style = 1
 			--boxData.LastTime = 3
-			local parentWindow = CS.WindowManager.Instance:FindWindowNodeByName("UIGame")
+			local parentWindow = CS.WindowManager.Instance:FindWindowNodeByName("GameUI2")
 			CS.MessageBoxUI.Show(boxData,parentWindow)
 		end
 	end
@@ -892,7 +892,7 @@ function NetMsgHandler.Received_CS_Exit_Room(message)
 	if resultType == 0 then
 		NetMsgHandler.ExitRoomToHall(handleType)
 	else
-		--CS.BubblePrompt.Show(data.GetString("Exit_Room_Error_".. resultType), "UIGame")
+		--CS.BubblePrompt.Show(data.GetString("Exit_Room_Error_".. resultType), "GameUI2")
 	end
 end
 
@@ -909,8 +909,8 @@ function NetMsgHandler.ExitRoomToHall(handleType)
 		-- 清理掉房间的数据
 		GameData.InitCurrentRoomInfo()
 		-- 清理掉GameUI 里的提示信息
-		CS.BubblePrompt.ClearPrompt("UIGame")
-		CS.WindowManager.Instance:CloseWindow("UIGame", false)
+		CS.BubblePrompt.ClearPrompt("GameUI2")
+		CS.WindowManager.Instance:CloseWindow("GameUI2", false)
 		if handleType == 2 then
 			CS.BubblePrompt.Show(data.GetString("Tip_Exit_Room_2"), "HallUI")
 		end
@@ -1032,7 +1032,7 @@ function NetMsgHandler.Received_CS_Checked_Card(message)
 		local cardIndex = message:PopByte()
 		NetMsgHandler.SetRoleCardCurrentState(roleType, cardIndex, true)
 	else
-		CS.BubblePrompt.Show(data.GetString("Checked_Card_Error_".. resultType), "UIGame")
+		CS.BubblePrompt.Show(data.GetString("Checked_Card_Error_".. resultType), "GameUI2")
 	end
 	
 end
@@ -1383,7 +1383,7 @@ function NetMsgHandler.Received_CS_Vip_Start_Game(message)
 	local resultType = message:PopByte()
 	-- 策划新需求 #58 【提示优化】
 	if resultType ~= 3 and resultType ~= 4 then
-		CS.BubblePrompt.Show(data.GetString("Start_Game_Error_".. resultType), "UIGame");
+		CS.BubblePrompt.Show(data.GetString("Start_Game_Error_".. resultType), "GameUI2");
 	end
 end
 
@@ -1428,7 +1428,7 @@ function NetMsgHandler.Received_CS_Up_Banker(message)
 			showMsg = string.format(showMsg, lua_NumberToStyle1String(GameConfig.GetFormatColdNumber(roomConfig.UpBankerGold)))
 		end
 	end
-	CS.BubblePrompt.Show(showMsg, "UIGame");
+	CS.BubblePrompt.Show(showMsg, "GameUI2");
 end
 
 ---------------------------------------------------------------------------
@@ -1480,10 +1480,10 @@ function NetMsgHandler.Received_S_Update_Banker(message)
 	NetMsgHandler.ParseAndSetBankerInfo(message)
 	
 	if GameData.RoomInfo.CurrentRoom.BankerInfo.IsLastForceDownBanker then
-		CS.BubblePrompt.Show(string.format(data.GetString("Down_Banker_Tips_Force"), lastBankerName), "UIGame")
+		CS.BubblePrompt.Show(string.format(data.GetString("Down_Banker_Tips_Force"), lastBankerName), "GameUI2")
 	end
 	
-	CS.BubblePrompt.Show(string.format(data.GetString("Update_Banker_Tips"), GameData.RoomInfo.CurrentRoom.BankerInfo.Name),"UIGame")
+	CS.BubblePrompt.Show(string.format(data.GetString("Update_Banker_Tips"), GameData.RoomInfo.CurrentRoom.BankerInfo.Name),"GameUI2")
 	
 	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.UpdateBankerInfo, 1)
 end
@@ -1541,7 +1541,7 @@ function NetMsgHandler.Received_CS_Request_Role_List(message)
 			playersUI.WindowData = playerList
 		end
 	else
-		CS.BubblePrompt.Show(data.GetString("Role_List_Error".. resultType), "UIGame")
+		CS.BubblePrompt.Show(data.GetString("Role_List_Error".. resultType), "GameUI2")
 	end
 end
 
@@ -1630,7 +1630,7 @@ end
 
 function NetMsgHandler.Received_CS_Apply_Down_Banker(message)
 	local resultType = message:PopByte()
-	CS.BubblePrompt.Show(data.GetString("Down_Banker_Error_".. resultType), "UIGame")
+	CS.BubblePrompt.Show(data.GetString("Down_Banker_Error_".. resultType), "GameUI2")
 end
 
 ---------------------------------------------------------------------------
@@ -1654,11 +1654,11 @@ function NetMsgHandler.Received_CS_Apply_Banker_State(message)
 				boxData.OKButtonName = "放弃"
 				boxData.CancelButtonName = "确定"
 				boxData.LuaCallBack = DownBankerButtonMessageBoxCallBack
-				local parentWindow = CS.WindowManager.Instance:FindWindowNodeByName("UIGame")
+				local parentWindow = CS.WindowManager.Instance:FindWindowNodeByName("GameUI2")
 				CS.MessageBoxUI.Show(boxData,parentWindow)
 			end
 		elseif state == 1 then
-			CS.BubblePrompt.Show(data.GetString("Down_Banker_Error_4"), "UIGame")
+			CS.BubblePrompt.Show(data.GetString("Down_Banker_Error_4"), "GameUI2")
 		end
 	end
 end
@@ -2166,8 +2166,8 @@ function NetMsgHandler.HandleAccountInfo(message)
 					-- 清理掉房间的数据
 					GameData.InitCurrentRoomInfo()
 					-- 清理掉GameUI 里的提示信息
-					CS.BubblePrompt.ClearPrompt("UIGame")
-					CS.WindowManager.Instance:CloseWindow("UIGame", false)
+					CS.BubblePrompt.ClearPrompt("GameUI2")
+					CS.WindowManager.Instance:CloseWindow("GameUI2", false)
 				end
 				CS.WindowManager.Instance:OpenWindow(openparam)
 				-- 切换状态为大厅
@@ -2209,7 +2209,7 @@ function NetMsgHandler.HandleRoomInfo(message)
 		if GameData.GameState == GAME_STATE.ROOM then  --不做处理
 			
 		elseif GameData.GameState == GAME_STATE.HALL then --切换界面为房间
-			local openparam = CS.WindowNodeInitParam("UIGame")
+			local openparam = CS.WindowNodeInitParam("GameUI2")
 			openparam.NodeType = 0
 			openparam.LoadComplatedCallBack = function (windowNode) CS.WindowManager.Instance:CloseWindow("HallUI", false) end
 			CS.WindowManager.Instance:OpenWindow(openparam)
