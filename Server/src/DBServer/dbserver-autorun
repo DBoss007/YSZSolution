@@ -1,3 +1,0 @@
-#!/bin/bash
-# Automatically Run dbserver-autorun Script
-    tmux new-session -d -s 'dbserver' '/opt/game/bin/dbserver-run'
