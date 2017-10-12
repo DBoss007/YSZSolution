@@ -22,7 +22,6 @@ end
 
 -- 邀请码按钮
 function InputCodeButton_OnClick()
-	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 	if GameData.RoleInfo.InviteCode == 0 and GameData.RoleInfo.PromoterStep ~= 3 then
 		local initParam =CS.WindowNodeInitParam('UIInviteCode')
 		initParam.ParentNode = this.WindowNode
@@ -32,7 +31,6 @@ end
 
 -- 分享按钮按钮
 function ShareButton_OnClick()
-	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 	--this.transform:Find('Canvas/ShareWay').gameObject:SetActive(true)
 	infoTable = {}
 	infoTable["title"] = "万人金花之搓牌高手[官方]"

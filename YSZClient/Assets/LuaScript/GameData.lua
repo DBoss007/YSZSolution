@@ -1,77 +1,76 @@
-GameData = 
+GameData =
 {
     LoginInfo =
     {
-        Account = "",
         -- 登陆的账号信息
-        PlatformType = PLATFORM_TYPE.PLATFORM_TOURISTS,
+        Account = "",
         -- 登陆的平台
-        AccountName = "",-- 登陆账号名称
+        PlatformType = PLATFORM_TYPE.PLATFORM_TOURISTS,
+        -- 登陆账号名称
+        AccountName = "",
     },
     -- 角色的相关信息
     RoleInfo =
     {
+        -- 账号
         Account = "",
-        -- 账号	
+        -- 账号ID
         AccountID = 0,
-        -- 账号ID	
+        -- 账号名称
         AccountName = "",
-        -- 账号名称	
-        AccountIcon = 0,
         -- 角色头像信息
+        AccountIcon = 0,
+        -- 砖石数量
         DiamondCount = 0,
-        -- 砖石数量	
-        GoldCount = 0,
         -- 金币数量
-        DisplayGoldCount = 0,
+        GoldCount = 0,
         -- 显示金币数量
+        DisplayGoldCount = 0,
+        -- 房卡数量
         RoomCardCount = 0,
-        -- 房卡数量	
+        -- 免费试玩次数
         FreePlayTime = 0,
-        -- 免费试玩次数	
-        FreeGoldCount = 0,
         -- 免费金币数
-        DisplayFreeGoldCount = 0,
+        FreeGoldCount = 0,
         -- 显示的免费金币数量
+        DisplayFreeGoldCount = 0,
+        -- Vip 等级
         VipLevel = 0,
-        -- Vip 等级	
-        ChargeCount = 0,
         -- 充值数量
+        ChargeCount = 0,
 
+        -- 昨日排名
         YesterdayRank = 0,
-        -- 昨日金币数
-        -- YesterdayWinRank = 0,		-- 昨日赢取金币数
+        -- 昨日赢取金币数
         YesterdayGoldNum = 0,
-        -- 昨日资产排名 -1表示未上榜
-        -- YesterdayWinNum = 0,		-- 昨日赢取排名 -1表示未上榜
 
         Cache =
         {
             ChangedGoldCount = 0,
             ChangedFreeGoldCount = 0
         },
-
-        PromoterStep = 0,
         -- 是否是推广员
-        InviteCode = 0,
+        PromoterStep = 0,
         -- 是否已经填写过邀请码
-        IsBindAccount = false,
+        InviteCode = 0,
         -- 是否已绑定账号
-        UnreadMailCount = 0,
+        IsBindAccount = false,
         -- 未读邮件数量
-        ModifyNameCount = 0,-- 修改名称次数
+        UnreadMailCount = 0,
+        -- 修改名称次数
+        ModifyNameCount = 0,
     },
-
 
     -- 房间的相关信息
     RoomInfo =
     {
-        CurrentRoom = { },
         -- 当前房间信息
-        RelationRooms = { },
+        CurrentRoom = { },
         -- [1] = {[10000] ={ Count = 5, [1] = {X = 1, Y = 1, Owner = 10001, }
+        RelationRooms = { },
+        -- 统计信息
         CurrentRoomChips = { },
-        -- 统计信息		
+        -- 房间路单信息
         StatisticsInfo = { },
     },
 
@@ -97,34 +96,26 @@ GameData =
     LastSmallHornTime = 0,
     -- 服务器ID
     ServerID = 0,
-
-    IsOpenApplePay = 1,
     -- 是否开启苹果支付,此值在登陆的时候由服务器初始化
-
-    IsPromptedInviteTips = true,
+    IsOpenApplePay = 1,
     -- 是否输入了邀请提示
-
-    IsShowInviteBtn = 1,
+    IsPromptedInviteTips = true,
     -- 是否显示邀请码按钮
-
-    AppVersionCheckResult = - 2,
+    IsShowInviteBtn = 1,
     -- App版本检查结果
-
-    IsAgreement = true,
+    AppVersionCheckResult = - 2,
     -- 是否同意协议
-
-    GameHistory = { MaxCount = 0, RequestedPage = 0, Datas = { } },
+    IsAgreement = true,
     -- 游戏历史数据
-
-    ancestorCode = 0,
-    -- 一代僵尸的邀请码
-
-    ChannelCode = 1,
+    GameHistory = { MaxCount = 0, RequestedPage = 0, Datas = { } },
     -- 玩家注册渠道ID
-    ConfirmChannelCode = false,-- 是否已经确认平台ID
-
-    OpenInstallReferralsID,-- OpenInstall推荐人ID
-    OpenInstallRoomID,-- OpenInstall房间ID
+    ChannelCode = 1,
+    -- 是否已经确认平台ID
+    ConfirmChannelCode = false,
+    -- OpenInstall推荐人ID
+    OpenInstallReferralsID,
+    -- OpenInstall房间ID
+    OpenInstallRoomID,
 };
 
 function GameData.InitHallData()
@@ -143,7 +134,16 @@ function GameData.InitHallData()
     GameData.HallData.Data[3] = 1
 end
 
-function GameData.InitCurrentRoomInfo()
+function GameData.InitCurrentRoomInfo(roomTypeParam)
+    if roomTypeParam == ROOM_TYPE.JH_JuLong then
+        GameData.InitBaiRenRoomInfo()
+    elseif roomTypeParam == ROOM_TYPE.JH_ZuJu then
+
+    end
+end
+
+-- (百人房间)数据初始化
+function GameData.InitBaiRenRoomInfo()
     GameData.RoomInfo.CurrentRoom =
     {
         MasterID = 0,
@@ -194,6 +194,7 @@ function GameData.InitCurrentRoomInfo()
         -- 本局追加统计信息事件参数
         AppendStatisticsEventArgs = nil,
     }
+
 end
 
 function GameData.ClearCurrentRoundData()
@@ -232,7 +233,7 @@ function GameData.SubFloatZeroPart(valueStr)
 end
 
 function GameData.Init()
-    GameData.InitCurrentRoomInfo()
+    GameData.InitCurrentRoomInfo(ROOM_TYPE.JH_JuLong)
     GameData.InitHallData()
 end
 

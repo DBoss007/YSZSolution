@@ -9,13 +9,11 @@ end
 
 -- 关闭按钮响应
 function CloseButtonOnClick()
-	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 	CS.WindowManager.Instance:CloseWindow('UIInviteCode', false)
 end
 
 -- 确定按钮按钮
 function OKButtonOnClick()
-	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 	local inviteCode = this.transform:Find('Canvas/Window/Content/CodeInput'):GetComponent("InputField").text
 	if #inviteCode > 0 then
 		if tonumber(inviteCode) == GameData.RoleInfo.AccountID then

@@ -149,7 +149,6 @@ function RankButtonOnClick()
             NetMsgHandler.SendRequestRanks(1)
         end
     end
-    CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 end
 
 -- 响应设置按钮点击事件
@@ -178,25 +177,21 @@ end
 -- 响应 创建VIP 房间按钮点击事件
 function CreateVipRoomButtonOnClick()
     CS.WindowManager.Instance:OpenWindow("UICreateRoom", this.WindowNode)
-    CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 end
 
 -- 响应 加入VIP 房间按钮点击事件
 function JoinVipRoomButtonOnClick()
     CS.WindowManager.Instance:OpenWindow("UIJoinRoom", this.WindowNode)
-    CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 end
 
 -- 响应 加金币按钮点击事件
 function AddGoldButtonOnClick()
     OpenConvertUI(1)
-    CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 end
 
 -- 响应 加房卡按钮点击事件
 function AddRoomCardButtonOnClick()
     OpenConvertUI(2)
-    CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 end
 
 -- 打开兑换界面
@@ -243,7 +238,6 @@ end
 -- 开启商城UI
 function OpenStoreUI()
     CS.WindowManager.Instance:OpenWindow("UIStore")
-    CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 end
 
 ----------------------------------------------------------------------

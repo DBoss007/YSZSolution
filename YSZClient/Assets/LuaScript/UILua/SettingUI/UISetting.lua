@@ -55,14 +55,12 @@ end
 
 -- 音乐开关
 function BackMusicSwithControlOnValueChanged(isOn)
-	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 	MusicMgr:MuteBackMusic(isOn)
 	MusicMgr:PlaySoundEffect(2)
 end
 
 -- 音效开关
 function EffectMusicSwithControlOnValueChanged(isOn)
-	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 	
 	MusicMgr:PlaySoundEffect(2)
 	MusicMgr:MuteSoundEffect(isOn)
@@ -70,7 +68,6 @@ end
 
 -- 绑定账号按钮
 function BindAccountButtonOnClick()
-	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 	
 	if GameData.RoleInfo.IsBindAccount == true then
 		local settings = this.transform:Find('Canvas/Window/Content/Settings/Viewport/Content')
@@ -89,7 +86,6 @@ end
 
 -- 切换账号按钮
 function SwitchAccountButtonOnClick()
-	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 	NetMsgHandler.CloseConnect()
 	LoginMgr.isChangeAccount = 1
 	NetMsgHandler.ReturnLogin()
@@ -104,7 +100,6 @@ end
 -- 邀请按钮
 function InviteButtonOnClick()
 	--判断自己是不是推广员，如果是，打开推广员界面，如果不是，打开输入邀请码界面
-	CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyPlayClickBtnSoundEffect, nil)
 	if GameData.RoleInfo.PromoterStep == 2 or GameData.RoleInfo.PromoterStep == 3 then
 		local initParam =CS.WindowNodeInitParam('UIInvite')
 		initParam.ParentNode = this.WindowNode
