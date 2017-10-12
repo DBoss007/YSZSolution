@@ -153,6 +153,11 @@ function AddButtonHandlers()
 	this.transform:Find('Canvas/MasterInfo/Buttons/JZButton'):GetComponent('Button').onClick:AddListener(OnJZButtonClick)
 	this.transform:Find('Canvas/MasterInfo/Buttons/GZButton'):GetComponent('Button').onClick:AddListener(OnGZButtonClick)
 	this.transform:Find('Canvas/MasterInfo/Buttons/BPButton'):GetComponent('Button').onClick:AddListener(OnBPButtonClick)
+	this.transform:Find('Canvas/MasterInfo/JZInfo'):GetComponent('Button').onClick:AddListener(OnJZHideClick)
+	this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton1'):GetComponent('Button').onClick:AddListener(function()  OnJZButtonOKClick(1)	end)
+	this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton2'):GetComponent('Button').onClick:AddListener(function()  OnJZButtonOKClick(2)	end)
+	this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton3'):GetComponent('Button').onClick:AddListener(function()  OnJZButtonOKClick(3)	end)
+	this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton4'):GetComponent('Button').onClick:AddListener(function()  OnJZButtonOKClick(4)	end)
 	
 end
 
@@ -230,6 +235,20 @@ function OnBPButtonClick()
 	-- body
 	print("玩家比牌按钮点击")
 end
+
+-- 玩家加注隐藏按钮call
+function OnJZHideClick()
+	-- body
+	print("玩家加注隐藏点击")
+	MasterJZInfoShow(false)
+end
+
+-- 加注筹码选择call
+function OnJZButtonOKClick( jiazhuParam )
+	-- body
+	print('加注筹码:'..jiazhuParam)
+end
+
 
 -- 下注按钮显示设置
 function MasterXZButtonShow( showParam )
