@@ -4,7 +4,7 @@ data = { };
 GameConfig =
 {
 	-- 开发测试阶段可开启 正式版本一定要记住关闭该功能
-    IsDebug = true,
+    IsDebug = false,
 	
 	IsSelectServer = 0, 	-- 是否启用选择服务器0表示不启用1表示启用，当ipv6的网络环境下此标志位无效
 	CanVisitorLogin = true,	-- 能否游客登陆(该标记位将从hub服务器下发)

@@ -274,6 +274,14 @@ function NetMsgHandler.OnCutOut(isCutOut)
 		--print("切入切出时，处于登陆状态，不做其他处理")
 		return
 	end
+	
+	print("切出游戏")
+    -- ***** 开发测试可开启 正式版本一定要记住关闭该功能****
+    if true == GameConfig.IsDebug then
+        return
+    end
+
+
 	if isCutOut == true then --切出
 		print("切出游戏")
 		CutOutTime = os.time()--记录下切出时刻

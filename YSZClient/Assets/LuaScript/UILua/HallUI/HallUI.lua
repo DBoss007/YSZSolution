@@ -19,6 +19,7 @@ function Awake()
     this.transform:Find('Canvas/Bottom/ButtonMail'):GetComponent("Button").onClick:AddListener(MailButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonRank'):GetComponent("Button").onClick:AddListener(RankButtonOnClick)
     this.transform:Find('Canvas/Bottom/ButtonSetting'):GetComponent("Button").onClick:AddListener(SettingButtonOnClick)
+    this.transform:Find('Canvas/Bottom/GameStart'):GetComponent("Button").onClick:AddListener(OnGameStartButtonOnClick)
 
     this.transform:Find('Canvas/Room3/Room2DetailInfo/Panel2/Content/CreateRoom'):GetComponent("Button").onClick:AddListener(CreateVipRoomButtonOnClick)
     this.transform:Find('Canvas/Room3/Room2DetailInfo/Panel2/Content/JoinRoom'):GetComponent("Button").onClick:AddListener(JoinVipRoomButtonOnClick)
@@ -154,6 +155,14 @@ end
 -- 响应设置按钮点击事件
 function SettingButtonOnClick()
     CS.WindowManager.Instance:OpenWindow("UISetting")
+end
+
+-- 快速游戏 call
+function OnGameStartButtonOnClick()
+    -- body
+    local initParam = CS.WindowNodeInitParam("GameUI1")
+    initParam.WindowData = 1
+    CS.WindowManager.Instance:OpenWindow(initParam)
 end
 
 -- 救济金call
