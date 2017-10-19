@@ -21,8 +21,8 @@ function Awake()
     this.transform:Find('Canvas/Bottom/ButtonSetting'):GetComponent("Button").onClick:AddListener(SettingButtonOnClick)
     this.transform:Find('Canvas/Bottom/GameStart'):GetComponent("Button").onClick:AddListener(OnGameStartButtonOnClick)
 
-    this.transform:Find('Canvas/Room3/Room2DetailInfo/Panel2/Content/CreateRoom'):GetComponent("Button").onClick:AddListener(CreateVipRoomButtonOnClick)
-    this.transform:Find('Canvas/Room3/Room2DetailInfo/Panel2/Content/JoinRoom'):GetComponent("Button").onClick:AddListener(JoinVipRoomButtonOnClick)
+    this.transform:Find('Canvas/Room3/Room2DetailInfo/Content/CreateRoom'):GetComponent("Button").onClick:AddListener(CreateVipRoomButtonOnClick)
+    this.transform:Find('Canvas/Room3/Room2DetailInfo/Content/JoinRoom'):GetComponent("Button").onClick:AddListener(JoinVipRoomButtonOnClick)
 
     this.transform:Find('Canvas/Center/Room1'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(1) end)
     this.transform:Find('Canvas/Center/Room2'):GetComponent("Button").onClick:AddListener( function() EnterSelectedRoom(2) end)
