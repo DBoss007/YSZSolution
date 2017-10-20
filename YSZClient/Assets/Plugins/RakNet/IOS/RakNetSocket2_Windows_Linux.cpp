@@ -9,6 +9,9 @@
  */
 
 #include "EmptyHeader.h"
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netdb.h>
 
 #ifdef RAKNET_SOCKET_2_INLINE_FUNCTIONS
 

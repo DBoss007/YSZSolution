@@ -9,6 +9,9 @@
  */
 
 #include "EmptyHeader.h"
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netdb.h>
 
 #ifdef RAKNET_SOCKET_2_INLINE_FUNCTIONS
 
@@ -281,16 +284,17 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4And6( RNS2_BerkleyBindParameters *bin
 
 
 	// On Ubuntu, "" returns "No address associated with hostname" while 0 works.
+    int res = 0;
 	if (bindParameters->hostAddress && 
-		(_stricmp(bindParameters->hostAddress,"UNASSIGNED_SYSTEM_ADDRESS")==0 || bindParameters->hostAddress[0]==0))
+		(strcmp(bindParameters->hostAddress,"UNASSIGNED_SYSTEM_ADDRESS")==0 || bindParameters->hostAddress[0]==0))
 	{
-		getaddrinfo(0, portStr, &hints, &servinfo);
+		res = getaddrinfo(0, portStr, &hints, &servinfo);
 	}
 	else
 	{
-		getaddrinfo(bindParameters->hostAddress, portStr, &hints, &servinfo);
+		res = getaddrinfo(bindParameters->hostAddress, portStr, &hints, &servinfo);
 	}
-
+    printf("getaddrinfo result = %d code = %s", res, gai_strerror(res) );
 	// Try all returned addresses until one works
 	for (aip = servinfo; aip != NULL; aip = aip->ai_next)
 	{
