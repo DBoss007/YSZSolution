@@ -15,7 +15,7 @@ GameConfig =
     InviteUrl = "http://jhysz.api.changlaith.com/downpage/main.php",
 
     -- 连接的HubServerURL 域名(正式服务器:clysz.hub.changlaith.com 苹果审核域名:jhysz.v10101hub.changlaith.com 本地服务器:192.168.1.3)
-    HubServerURL = "clysz.hub.changlaith.com",
+    HubServerURL = "118.190.159.166",
     GameServerURL = "jhysz.s10.changlaith.com",
     -- 链接服务器地址 由服务器下发
     HubServerPort = 20000,
@@ -75,6 +75,8 @@ ROOM_TYPE =
     JH_JuLong = 1,
     -- 金花 组局房 5人对战
     JH_ZuJu = 2,
+    -- 金花 闷鸡房间 5人对战
+    JH_MenJi = 3,
 }
 
 

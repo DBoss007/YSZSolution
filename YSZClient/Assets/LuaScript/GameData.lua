@@ -138,7 +138,7 @@ function GameData.InitCurrentRoomInfo(roomTypeParam)
     if roomTypeParam == ROOM_TYPE.JH_JuLong then
         GameData.InitBaiRenRoomInfo()
     elseif roomTypeParam == ROOM_TYPE.JH_ZuJu then
-
+        GameData.InitZuJuRoomInfo()
     end
 end
 
@@ -195,6 +195,48 @@ function GameData.InitBaiRenRoomInfo()
         AppendStatisticsEventArgs = nil,
     }
 
+end
+
+--==============================--
+--desc: 组局房间初始化
+--time:2017-10-23 07:10:56
+--@return 
+--==============================--
+function GameData.InitZuJuRoomInfo()
+    -- body
+    GameData.RoomInfo.CurrentRoom =
+    {
+        -- 房间ID
+        RoomID = 0,
+        -- 房主ID
+        MasterID = 1,
+        -- 房间大类型
+        BigType = 20,
+        -- 房间值类型
+        SmallType = 0,
+        -- 房间模式(经典 激情)
+        GameMode = 0,
+        -- 比闷模式(必闷1圈 必闷3圈)
+        GameRule = 0,
+        -- 房间底注
+        BetMin = 0,
+        -- 下注上限
+        BetMax = 1,
+        -- 房间状态
+        RoomState = 0,
+        -- 当前状态CD
+        CountDown = 0,
+        -- 玩家自己位置
+        SelfPosition = 0,
+        -- 庄家位置
+        BankerPosition = 1,
+        -- 当前下注总额
+        BetAllValue = 0,
+        -- 当前对战回合
+        RoundTimes = 0,
+        -- 房间对应位置玩家详细数据
+        ZUJUPlayers = { },
+    }
 end
 
 function GameData.ClearCurrentRoundData()
