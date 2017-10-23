@@ -69,4 +69,5 @@ function CreateRoomButton_OnClick()
 	else
 		CS.BubblePrompt.Show(data.GetString("Create_Room_Error_4"), "UICreateRoom")
 	end
+	NetMsgHandler.Send_CS_JH_Create_Room(10,200,1,1,1,300,200)
 end

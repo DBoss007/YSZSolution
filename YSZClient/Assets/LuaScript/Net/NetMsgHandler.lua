@@ -2236,6 +2236,7 @@ function NetMsgHandler.Send_CS_JH_Create_Room(betMinParam, betMaxParam,isLockPar
     message:PushUInt32(quitBetParam)
     
     NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Create_Room, message, true)
+    print(string.format( "=====Min:%d Max:%d Lock:%d RoomType:%d MenJi:%d EnterBet:%d QuitBet:%d",betMinParam, betMaxParam,isLockParam,roomTypeParam,menTimesParam,enterBetParam, quitBetParam))
 end
 
 -- 组局厅请求创建房间反馈
@@ -2251,6 +2252,7 @@ function NetMsgHandler.Received_CS_JH_Create_Room( message )
     else
         CS.BubblePrompt.Show(data.GetString("JH_Create_Room_Error_" .. resultType), "HallUI")
     end
+    print("=====CS_JH_Create_Room Result:"..resultType)
 end
 
 --===========================================================================--
@@ -2308,6 +2310,17 @@ function NetMsgHandler.Received_S_JH_Set_Game_Data( message )
     -- body
     NetMsgHandler.ParseJHRoomBaseInfo(message)
     NetMsgHandler.ParseJHRoomPlayersInfo(message)
+
+    -- 进入游戏房间
+    local openparam = CS.WindowNodeInitParam("GameUI1")
+    openparam.NodeType = 0
+    openparam.LoadComplatedCallBack = function(windowNode)
+        CS.WindowManager.Instance:CloseWindow("HallUI", false)
+    end
+    CS.WindowManager.Instance:OpenWindow(openparam)
+
+    -- 切换状态为房间
+    GameData.GameState = GAME_STATE.ROOM
 
 end
 

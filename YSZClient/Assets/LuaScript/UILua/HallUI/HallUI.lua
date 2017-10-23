@@ -158,6 +158,9 @@ end
 
 -- 快速游戏 call
 function OnGameStartButtonOnClick()
+    --TODO 测试
+    NetMsgHandler.Send_CS_JH_Create_Room(10,200,1,1,1,300,200)
+
     -- body
     local initParam = CS.WindowNodeInitParam("GameUI1")
     initParam.WindowData = 1
