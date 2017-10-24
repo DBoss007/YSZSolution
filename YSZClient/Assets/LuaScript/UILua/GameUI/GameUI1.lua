@@ -126,12 +126,14 @@ end
 -- UI 开启
 function WindowOpened()
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.InitRoomState, ResetGameRoomToRoomState)
+    CS.EventDispatcher.Instance:AddEventListener(EventDefine.UpdateRoomState, RefreshGameRoomByRoomStateSwitchTo)
 
 end
 
 -- UI 关闭
 function WindowClosed()
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.InitRoomState, ResetGameRoomToRoomState)
+    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.UpdateRoomState, RefreshGameRoomByRoomStateSwitchTo)
 
 end
 
@@ -203,17 +205,19 @@ function OnSitUpButtonClick()
     SetCaidanShow(false)
 end
 
-
-
-
-
 -------------------------------按钮 call end--------------------------------------------------
 
--- ===============发牌阶段===============--
+-- ===============【等待开局】【1】ZUJURoomState.Start===============--
+
+-- ===============【等待准备】【2】 ZUJURoomState.Wait===============--
 
 
--- ===============轮流下注阶段===============--
+-- ===============【收取底注】【3】 ZUJURoomState.SubduceBet===============--
 
+
+-- ===============【洗牌发牌】【4】 ZUJURoomState.Deal===============--
+
+-- ===============【下注阶段】【5】 ZUJURoomState.Betting===============--
 -- ===============弃牌、加注、跟注、比牌===============--
 
 -- 玩家弃牌按钮call
@@ -273,6 +277,13 @@ function MasterJZInfoShow(showParam)
     -- body
     mMasterXZInfo.JZButtonGameObject:SetActive(showParam)
 end
+
+
+
+-- ===============【比牌阶段】【6】 ZUJURoomState.CardVS===============--
+
+-- ===============【比牌阶段】【7】 ZUJURoomState.Settlement===============--
+
 
 -- ===============玩家自己看牌阶段===============--
 

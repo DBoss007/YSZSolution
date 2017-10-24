@@ -2311,7 +2311,8 @@ function NetMsgHandler.Received_S_JH_Set_Game_Data( message )
     NetMsgHandler.ParseJHRoomBaseInfo(message)
     NetMsgHandler.ParseJHRoomPlayersInfo(message)
     NetMsgHandler.ParseAllBetInfo(message)
-
+    
+    CS.EventDispatcher.Instance:TriggerEvent(EventDefine.InitRoomState, GameData.RoomInfo.CurrentRoom.RoomState)
     -- 进入游戏房间
     local openparam = CS.WindowNodeInitParam("GameUI1")
     openparam.NodeType = 0
