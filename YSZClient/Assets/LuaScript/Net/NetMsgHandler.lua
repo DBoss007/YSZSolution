@@ -2310,6 +2310,7 @@ function NetMsgHandler.Received_S_JH_Set_Game_Data( message )
     -- body
     NetMsgHandler.ParseJHRoomBaseInfo(message)
     NetMsgHandler.ParseJHRoomPlayersInfo(message)
+    NetMsgHandler.ParseAllBetInfo(message)
 
     -- 进入游戏房间
     local openparam = CS.WindowNodeInitParam("GameUI1")
@@ -2338,15 +2339,98 @@ function NetMsgHandler.ParseJHRoomBaseInfo( message )
     GameData.RoomInfo.CurrentRoom.RoomState  = message:PopByte()
     GameData.RoomInfo.CurrentRoom.CountDown = message:PopUInt32() / 1000.0
     GameData.RoomInfo.CurrentRoom.SelfPosition = message:PopByte()    
-    GameData.RoomInfo.CurrentRoom.BankerPosition = message:PopByte()
+    local BankerPosition = message:PopByte()
     GameData.RoomInfo.CurrentRoom.BetAllValue = message:PopInt64()
     GameData.RoomInfo.CurrentRoom.RoundTimes  = message:PopByte()
     -- 位置转换
+    GameData.RoomInfo.CurrentRoom.BankerPosition = GameData.PlayerPositionConvert2ShowPosition(BankerPosition)
 end
 
 -- 解析房间玩家列表
 function NetMsgHandler.ParseJHRoomPlayersInfo( message )
     -- body
+    local playerCount = message:PopUInt16()
+
+    for index = 1 ,playerCount, 1 do
+        local playerID = message:PopUInt32()
+        local Name = message:PopString()
+        local HeadIcon = message:PopByte()
+        local HeadUrl = message:PopString()
+        local GoldValue = message:PopInt64()
+        local severposition = message:PopByte()
+        local PlayerState = message:PopByte()
+        local CheckState= message:PopByte()
+        local FoldState = message:PopByte()
+        local CompareState = message:PopByte()
+        local CompareResult = message:PopByte()
+
+        local position  = GameData.PlayerPositionConvert2ShowPosition(severposition)
+        GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].AccountID = playerID
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Name = Name
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].HeadIcon = HeadIcon
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].HeadUrl = HeadUrl
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].GoldValue = GoldValue
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Position = severposition
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState = PlayerState
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CheckState = CheckState
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CompareState = CompareState
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CompareResult = CompareResult
+        -- 扑克牌解析
+        local cardCount  = message:PopUInt16()
+        for cardIndex = 1, cardCount, 1 do
+            PokerType = message:PopByte()
+            PokerNumber = message:PopByte()
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Pokers[cardIndex].PokerType = PokerType
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Pokers[cardIndex].PokerNumber = PokerNumber
+        end
+
+    end
+
+end
+
+-- 解析当前所有下注情况
+function NetMsgHandler.ParseAllBetInfo( message )
+    -- body
+    local betCount  = message:PopUInt16()
+    for index = 1, betCount, 1 do
+        local position = message:PopByte()
+        local betValue  = message:PopInt64()
+        local BetInfo  = { Position = position, BetValue = betValue }
+        GameData.RoomInfo.CurrentRoom.AllBetInfo[index] = BetInfo
+    end
+end
+
+-- 解析当前结算信息
+function NetMsgHandler.ParseGameResultInfo( message )
+    -- body
+    -- 赢家ID
+    local WinnerID = message:PopUInt32()
+    local WinnerPosition = message:PopByte()
+    local WinGoldValue = message:PopInt64()
+    local WinnerGoldValue = message:PopInt64()
+    WinnerPosition = GameData.PlayerPositionConvert2ShowPosition(WinnerPosition)
+    WinGoldValue = GameConfig.GetFormatColdNumber(WinGoldValue)
+    WinnerGoldValue = GameConfig.GetFormatColdNumber(WinnerGoldValue)
+
+    GameData.RoomInfo.CurrentRoom.WinnerID = WinnerID
+    GameData.RoomInfo.CurrentRoom.WinnerPosition = WinnerPosition
+    GameData.RoomInfo.CurrentRoom.WinGoldValue = WinGoldValue
+    GameData.RoomInfo.CurrentRoom.WinnerGoldValue = WinnerGoldValue
+
+    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[WinnerPosition].GoldValue = WinnerGoldValue
+
+    local showCount = message:PopUInt16()
+    for i = 1, showCount, 1 do
+        local showPosition  = message:PopByte()
+        showPosition = GameData.PlayerPositionConvert2ShowPosition(showPosition)
+        local cardCount  = message:PopUInt16()
+        for cardIndex = 1, cardCount, 1 do
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[showPosition].PokerList[cardIndex].PokerType = message:PopByte()
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[showPosition].PokerList[cardIndex].PokerNumber = message:PopByte()
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[showPosition].PokerList[cardIndex].Visible = true
+        end
+    end
 end
 
 --============================================================================--

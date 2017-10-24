@@ -439,3 +439,45 @@ function GameConfig.GetLogicColdNumber(formatGold)
     logicGold = formatGold * data.PublicConfig.GOLD_TO_RMB_RATE
     return logicGold
 end
+
+-- 玩家游戏状态
+Player_State = 
+{
+    -- 位置空闲
+    None = 0,
+    -- 坐下未参与游戏
+    JoinNO = 1,
+    -- 参与游戏
+    JoinOK = 2,
+}
+
+-- 组局厅 房间状态
+ZUJURoomState =
+{
+    -- 开始(等待服务器自动开始)
+    Start = 1,
+    -- 等待准备
+    Wait = 2,
+    -- 收取底注
+    SubduceBet = 3,
+    -- 发牌
+    Deal = 4,
+    -- 下注阶段
+    Betting = 5,
+    -- 比牌阶段
+    CardVS = 6,
+    -- 结算阶段
+    Settlement = 7,
+}
+
+-- 百人厅 各房间状态CD时间
+ROOM_TIME =
+{
+    [ZUJURoomState.Start] = 9,
+    [ZUJURoomState.Wait] = 5,
+    [ZUJURoomState.SubduceBet] = 2,
+    [ZUJURoomState.Deal] = 3,
+    [ZUJURoomState.Betting] = 10,
+    [ZUJURoomState.CardVS] = 15,
+    [ZUJURoomState.Settlement] = 3,
+}

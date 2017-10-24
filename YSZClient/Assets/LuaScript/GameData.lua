@@ -60,6 +60,34 @@ GameData =
         -- 修改名称次数
         ModifyNameCount = 0,
     },
+    -- 组局玩家信息
+    ZuJuPlayer = 
+    {
+        -- 玩家ID
+        AccountID = 0,
+        -- 名称
+        Name = '同花顺',
+        -- 头像ID
+        IconID = 0,
+        -- 玩家头像url
+        IconUrl = '',
+        -- 当前拥有金币数量
+        GoldValue = 0,
+        -- 玩家位置
+        Position = 0,
+        -- 玩家参与游戏状态(0 空位 1 旁观 2参与)
+        PlayerState = 0,
+        -- 看牌标记(0为看牌 1看牌)
+        CheckState= 0,
+        -- 弃牌状态(0 未弃牌 1弃牌)
+        FoldState = 0,
+        -- 比牌状态(0 未比牌 1比牌)
+        CompareState = 0,
+        -- 比牌结果(0 默认状态 1比牌输 2 比牌赢)
+        CompareResult = 0,
+        -- 扑克列表
+        PokerList = {},
+    },
 
     -- 房间的相关信息
     RoomInfo =
@@ -146,40 +174,41 @@ end
 function GameData.InitBaiRenRoomInfo()
     GameData.RoomInfo.CurrentRoom =
     {
-        MasterID = 0,
         -- 房主ID
-        RoomState = 1,
+        MasterID = 0,
         -- 房间当前阶段
-        CountDown = 20,
+        RoomState = 1,
         -- 倒计时
-        RoomID = 0,
+        CountDown = 20,
         -- 房间ID
-        TemplateID = 0,
+        RoomID = 0,
         -- 房间模板ID
-        IsFreeRoom = false,
+        TemplateID = 0,
         -- 是否是试水厅
-        IsVipRoom = false,
+        IsFreeRoom = false,
         -- 是否是VIP厅
-        RoleCount = 0,
+        IsVipRoom = false,
         -- 房间人数
-        Pokers = { },
+        RoleCount = 0,
         -- 存储当前收到的扑克牌信息 格式为：[1] = {PokerType = 1, PokerNumber = 14, Visible = true,}
-        MaxRound = 0,
+        Pokers = { },
         -- 最大局数
-        CurrentRound = 0,
+        MaxRound = 0,
         -- 当前局数
-        BankerInfo = { ID = 0, Name = "", Gold = 0, LeftCount = 0, HeadIcon = 0 },
+        CurrentRound = 0,
         -- 庄家信息
-        CheckRole1 = { ID = 0, Name = "", Icon = 1, },
+        BankerInfo = { ID = 0, Name = "", Gold = 0, LeftCount = 0, HeadIcon = 0 },
         -- 龙信息
-        CheckRole2 = { ID = 0, Name = "", Icon = 1, },
+        CheckRole1 = { ID = 0, Name = "", Icon = 1, },
         -- 虎信息
-        GameResult = 0,
+        CheckRole2 = { ID = 0, Name = "", Icon = 1, },
         -- 本局结果信息 位运算：1 龙赢，2 虎赢，4 和，8 龙金花 16 龙豹子 32 龙金花
-        WinGold = { },
+        GameResult = 0,
         -- 赢取的金币
+        WinGold = { },
+        -- 当前选择下注的金额
         SelectBetValue = 0,
-        -- 当前选择下注的金额		
+        
         -- [4(区域编号)] = {[0(自己)]={Value(值) = 0, Rank(排行) = 0 },[1(排行榜1)] = {Name(名称) ="", Value(值) = 0}},
         BetRankList = { },
         -- 自己的押注信息
@@ -210,6 +239,8 @@ function GameData.InitZuJuRoomInfo()
         RoomID = 0,
         -- 房主ID
         MasterID = 1,
+        -- 房间类型
+        RoomType = ROOM_TYPE.JH_MenJi,
         -- 房间大类型
         BigType = 20,
         -- 房间值类型
@@ -236,7 +267,56 @@ function GameData.InitZuJuRoomInfo()
         RoundTimes = 0,
         -- 房间对应位置玩家详细数据
         ZUJUPlayers = { },
+        -- 当前房间所有下注情况
+        AllBetInfo = {},
+
+        -- 本局结算信息
+        -- 赢家ID
+        WinnerID = 0,
+        -- 赢家位置
+        WinnerPosition = 0,
+        -- 赢家赢取金币
+        WinGoldValue = 0,
+        -- 赢家当前金币值
+        WinnerGoldValue = 0,
+        -- 亮牌玩家列表  [1] = {Position = 1,PokerCard[1] = {PokerType = 1, PokerNumber = 1,},PokerCard[2] = {PokerType = 1, PokerNumber = 1,},PokerCard[3] = {PokerType = 1, PokerNumber = 1,} }
+        -- 直接映射到具体位置玩家扑克列表
+        
+
     }
+    -- 房间列表信息
+    for i = 1, 5, 1 do
+        -- 初始化玩家基础信息
+        local playerInfo = lua_NewTable(GameData.ZuJuPlayer)
+        playerInfo.Position = i
+        playerInfo.Name = '帝濠'..i
+        playerInfo.PlayerState = Player_State.None
+        playerInfo.CheckState = 0
+        playerInfo.FoldState = 0
+        playerInfo.CompareState = 0
+        playerInfo.CompareResult = 0
+        playerInfo.PokerList = { }
+
+        -- 初始化玩家扑克牌
+        for card = 1, 3, 1 do
+            playerInfo.PokerList[card] = { }
+            local pokerData = { PokerType = 1, PokerNumber = card, Visible = false, }
+            playerInfo.PokerList[card] = pokerData
+        end
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[i] = playerInfo
+    end
+
+end
+
+-- 组局厅玩家显示位置转换
+function GameData.PlayerPositionConvert2ShowPosition(tagPositionParam)
+    if tagPositionParam > 0 then
+        local position =(5 - GameData.RoomInfo.CurrentRoom.SelfPosition + tagPositionParam - 1) % 5 + 1
+        return position
+    else
+        print("服务器传入位置有误:" .. tagPositionParam)
+        return 0
+    end
 end
 
 function GameData.ClearCurrentRoundData()
