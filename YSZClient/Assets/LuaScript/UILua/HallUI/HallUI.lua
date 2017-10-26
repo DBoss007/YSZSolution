@@ -35,6 +35,13 @@ function Awake()
     this.transform:Find('Canvas/Center/BenefitButton'):GetComponent("Button").onClick:AddListener(BenefitButtonOnClick)
     this.transform:Find('Canvas/Center/SevenDayButton'):GetComponent("Button").onClick:AddListener(SevenDayButtonOnClick)
 
+    -- 经典厅 房间响应
+    this.transform:Find('Canvas/Room2/RoomInfo1'):GetComponent("Button").onClick:AddListener( function() EnterJingDianRoom(1) end)
+    this.transform:Find('Canvas/Room2/RoomInfo2'):GetComponent("Button").onClick:AddListener( function() EnterJingDianRoom(2) end)
+    this.transform:Find('Canvas/Room2/RoomInfo3'):GetComponent("Button").onClick:AddListener( function() EnterJingDianRoom(3) end)
+    this.transform:Find('Canvas/Room2/RoomInfo4'):GetComponent("Button").onClick:AddListener( function() EnterJingDianRoom(4) end)
+
+
     InitHallUIRoomTypeInfo()
 end
 
@@ -158,8 +165,9 @@ end
 
 -- 快速游戏 call
 function OnGameStartButtonOnClick()
-    --TODO 测试
-    NetMsgHandler.Send_CS_JH_Create_Room(10,200,1,1,1,300,200)
+    -- TODO 测试
+    GameData.InitCurrentRoomInfo(ROOM_TYPE.JH_ZuJu)
+    NetMsgHandler.Send_CS_JH_Create_Room(10, 200, 1, 1, 1, 300, 200)
 
     -- body
     local initParam = CS.WindowNodeInitParam("GameUI1")
@@ -250,7 +258,6 @@ function InitHallUIRoomTypeInfo()
 
     -- 初始化聚龙厅房间
     local roomRoot = this.transform:Find('Canvas/Room1/Room1Content/Viewport/Content')
-
     for index = 1, 7, 1 do
         local roomInfoItem = roomRoot:Find('Room1Info' .. index)
         mJuLongRooms[index] = roomInfoItem
@@ -338,6 +345,14 @@ function UpdateRelationRoomList(param)
 
     this.transform:Find('Canvas/DetailInfo/Panel2/Content/RelativeRooms/Viewport/NoneTip').gameObject:SetActive(isShowNoneTips)
 end
+
+-- =============================经典厅功能=============================================
+
+-- 经典厅 房间进入请求(参数1:房间子类型 0 1 2 3 4)
+function EnterJingDianRoom(subTypeParam)
+    NetMsgHandler.Send_CS_JH_Enter_Room2(subTypeParam)
+end
+
 
 -- 显示(Guide)引导 UI
 function TryShowGuideOfRoomType(roomType)

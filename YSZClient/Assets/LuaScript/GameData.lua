@@ -61,7 +61,7 @@ GameData =
         ModifyNameCount = 0,
     },
     -- 组局玩家信息
-    ZuJuPlayer = 
+    ZuJuPlayer =
     {
         -- 玩家ID
         AccountID = 0,
@@ -78,7 +78,7 @@ GameData =
         -- 玩家参与游戏状态(0 空位 1 旁观 2参与)
         PlayerState = 0,
         -- 看牌标记(0为看牌 1看牌)
-        CheckState= 0,
+        CheckState = 0,
         -- 弃牌状态(0 未弃牌 1弃牌)
         FoldState = 0,
         -- 比牌状态(0 未比牌 1比牌)
@@ -86,7 +86,7 @@ GameData =
         -- 比牌结果(0 默认状态 1比牌输 2 比牌赢)
         CompareResult = 0,
         -- 扑克列表
-        PokerList = {},
+        PokerList = { },
     },
 
     -- 房间的相关信息
@@ -165,7 +165,7 @@ end
 function GameData.InitCurrentRoomInfo(roomTypeParam)
     if roomTypeParam == ROOM_TYPE.JH_JuLong then
         GameData.InitBaiRenRoomInfo()
-    elseif roomTypeParam == ROOM_TYPE.JH_ZuJu then
+    else
         GameData.InitZuJuRoomInfo()
     end
 end
@@ -174,14 +174,14 @@ end
 function GameData.InitBaiRenRoomInfo()
     GameData.RoomInfo.CurrentRoom =
     {
+        -- 房间ID
+        RoomID = 0,
         -- 房主ID
         MasterID = 0,
         -- 房间当前阶段
         RoomState = 1,
         -- 倒计时
         CountDown = 20,
-        -- 房间ID
-        RoomID = 0,
         -- 房间模板ID
         TemplateID = 0,
         -- 是否是试水厅
@@ -208,7 +208,7 @@ function GameData.InitBaiRenRoomInfo()
         WinGold = { },
         -- 当前选择下注的金额
         SelectBetValue = 0,
-        
+
         -- [4(区域编号)] = {[0(自己)]={Value(值) = 0, Rank(排行) = 0 },[1(排行榜1)] = {Name(名称) ="", Value(值) = 0}},
         BetRankList = { },
         -- 自己的押注信息
@@ -226,17 +226,17 @@ function GameData.InitBaiRenRoomInfo()
 
 end
 
---==============================--
---desc: 组局房间初始化
---time:2017-10-23 07:10:56
---@return 
---==============================--
+-- ==============================--
+-- desc: 组局房间初始化
+-- time:2017-10-23 07:10:56
+-- @return
+-- ==============================--
 function GameData.InitZuJuRoomInfo()
     -- body
     GameData.RoomInfo.CurrentRoom =
     {
         -- 房间ID
-        RoomID = 0,
+        RoomID = 123,
         -- 房主ID
         MasterID = 1,
         -- 房间类型
@@ -254,7 +254,7 @@ function GameData.InitZuJuRoomInfo()
         -- 下注上限
         BetMax = 1,
         -- 房间状态
-        RoomState = 0,
+        RoomState = ZUJURoomState.Start,
         -- 当前状态CD
         CountDown = 0,
         -- 玩家自己位置
@@ -268,7 +268,7 @@ function GameData.InitZuJuRoomInfo()
         -- 房间对应位置玩家详细数据
         ZUJUPlayers = { },
         -- 当前房间所有下注情况
-        AllBetInfo = {},
+        AllBetInfo = { },
 
         -- 本局结算信息
         -- 赢家ID
@@ -281,7 +281,7 @@ function GameData.InitZuJuRoomInfo()
         WinnerGoldValue = 0,
         -- 亮牌玩家列表  [1] = {Position = 1,PokerCard[1] = {PokerType = 1, PokerNumber = 1,},PokerCard[2] = {PokerType = 1, PokerNumber = 1,},PokerCard[3] = {PokerType = 1, PokerNumber = 1,} }
         -- 直接映射到具体位置玩家扑克列表
-        
+
 
     }
     -- 房间列表信息
@@ -289,8 +289,8 @@ function GameData.InitZuJuRoomInfo()
         -- 初始化玩家基础信息
         local playerInfo = lua_NewTable(GameData.ZuJuPlayer)
         playerInfo.Position = i
-        playerInfo.Name = '帝濠'..i
-        playerInfo.PlayerState = Player_State.None
+        playerInfo.Name = '帝濠' .. i
+        playerInfo.PlayerState = Player_State.JoinNO
         playerInfo.CheckState = 0
         playerInfo.FoldState = 0
         playerInfo.CompareState = 0

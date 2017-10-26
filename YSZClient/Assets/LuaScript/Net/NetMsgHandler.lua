@@ -2236,7 +2236,7 @@ function NetMsgHandler.Send_CS_JH_Create_Room(betMinParam, betMaxParam,isLockPar
     message:PushUInt32(quitBetParam)
     
     NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Create_Room, message, true)
-    print(string.format( "=====Min:%d Max:%d Lock:%d RoomType:%d MenJi:%d EnterBet:%d QuitBet:%d",betMinParam, betMaxParam,isLockParam,roomTypeParam,menTimesParam,enterBetParam, quitBetParam))
+    print(string.format( "-----Min:%d Max:%d Lock:%d RoomType:%d MenJi:%d EnterBet:%d QuitBet:%d",betMinParam, betMaxParam,isLockParam,roomTypeParam,menTimesParam,enterBetParam, quitBetParam))
 end
 
 -- 组局厅请求创建房间反馈
@@ -2265,6 +2265,7 @@ function NetMsgHandler.Send_CS_JH_Enter_Room1( roomIDParam )
     message:PushUInt32(GameData.RoleInfo.AccountID)
     message:PushUInt32(roomIDParam)
     NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Enter_Room1, message, true)
+    print("-----CS_JH_Enter_Room1 ID:"..roomIDParam)
 end
 
 -- 组局厅请求进入组局房间
@@ -2276,6 +2277,7 @@ function NetMsgHandler.Received_CS_JH_Enter_Room1( message )
     else
         CS.BubblePrompt.Show(data.GetString("JH_Enter_Room1_Error_" .. resultType), "HallUI")
     end
+    print("=====CS_JH_Enter_Room1 Result:"..resultType)
 end
 
 --===========================================================================--
@@ -2288,6 +2290,8 @@ function NetMsgHandler.Send_CS_JH_Enter_Room2( roomTypeParam )
     message:PushUInt32(GameData.RoleInfo.AccountID)
     message:PushByte(roomTypeParam)
     NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Enter_Room2, message, true)
+    print("-----CS_JH_Enter_Room2 ID:"..roomTypeParam)
+
 end
 
 
