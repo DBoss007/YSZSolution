@@ -100,7 +100,32 @@ function InitPlayerUIElement()
         dataItem.JZImage = childItem:Find('JZImage')
         dataItem.GZImage = childItem:Find('GZImage')
     end
+
 end
+
+-- 还原玩家对应位置到初始状态
+function ResetPlayerInfo2Defaul(positionParam)
+    -- body
+    mPlayersUIInfo[positionParam].YQButton.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].ZXButton.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].HeadIcon.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].HandleCD.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].GoldInfo.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].BetingInfo.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].KPImage.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].QPImage.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].JZImage.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].GZImage.gameObject:SetActive(false)
+end
+
+function SetPlayerHeadIcon(positionParam)
+    -- body
+    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam].PlayerState ~= Player_State.None then
+        -- body
+        
+    end
+end
+
 
 -- 还原UI默认基础显示状态
 function RestoreUI2Default()
@@ -171,7 +196,6 @@ end
 -- 菜单按钮 call
 function OnCaidanButtonClick()
     -- body
-    print('菜单按钮点击')
     SetCaidanShow(true)
 end
 
@@ -207,17 +231,64 @@ end
 
 -------------------------------按钮 call end--------------------------------------------------
 
+function ResetGameRoomToRoomState(currentState)
+    canPlaySoundEffect = false
+    -- 停止掉所有的协程
+    this:StopAllDelayInvoke()
+	InitRoomBaseInfos()
+	RefreshGameRoomToEnterGameState(currentState, true)
+	canPlaySoundEffect = true
+end
+
+-- 刷新游戏房间到游戏状态
+function RefreshGameRoomToEnterGameState(roomState, isInit)
+	if isInit or roomState == ZUJURoomState.Wait then
+        -- 调用下GC回收
+		lua_Call_GC()
+	end
+	RefreshStartPartOfGameRoomByState(roomState)
+	RefreshWaitPartOfGameRoomByState(roomState, isInit)
+	RefreshSubduceBetPartOfGameRoomByState(roomState, isInit)
+	RefreshDealPartOfGameRoomByState(roomState, isInit)
+	RefreshBettingPartOfGameRoomByState(roomState, isInit)
+	RefreshCardVSPartOfGameRoomByState(roomState, isInit)
+	RefreshSettlementPartOfGameRoomByState(roomState, isInit)
+end
+
+
 -- ===============【等待开局】【1】ZUJURoomState.Start===============--
+-- 等待游戏开局
+function RefreshStartPartOfGameRoomByState( roomStateParam, initParam )
+    -- body
+    if roomStateParam == ZUJURoomState.Start then
+        -- body
+    end
+end
 
 -- ===============【等待准备】【2】 ZUJURoomState.Wait===============--
 
+function RefreshWaitPartOfGameRoomByState( roomStateParam, initParam )
+    -- body
+end
 
 -- ===============【收取底注】【3】 ZUJURoomState.SubduceBet===============--
 
+function RefreshSubduceBetPartOfGameRoomByState( roomStateParam, initParam )
+    -- body
+end
 
 -- ===============【洗牌发牌】【4】 ZUJURoomState.Deal===============--
 
+function RefreshDealPartOfGameRoomByState( roomStateParam, initParam )
+    -- body
+end
+
 -- ===============【下注阶段】【5】 ZUJURoomState.Betting===============--
+
+function RefreshBettingPartOfGameRoomByState( roomStateParam, initParam )
+    -- body
+end
+
 -- ===============弃牌、加注、跟注、比牌===============--
 
 -- 玩家弃牌按钮call
@@ -282,199 +353,10 @@ end
 
 -- ===============【比牌阶段】【6】 ZUJURoomState.CardVS===============--
 
--- ===============【比牌阶段】【7】 ZUJURoomState.Settlement===============--
 
-
--- ===============玩家自己看牌阶段===============--
-
--- 设置搓牌组件显示
-function ShowPokerHandle(show)
-
-    if mPokerHandle.activeSelf == show then
-        return
-    end
-    mPokerHandle:SetActive(show)
-end
-
-function StartEnterCheckAnimation(isHandler, isAni)
-    isStartEnterCheckAnimation = true
-    -- 对应角色的扑克牌
-    local pokerCard1 = mRoomData.ZHUJUPlayerList[5].Pokers[4]
-    local pokerCard2 = mRoomData.ZHUJUPlayerList[5].Pokers[5]
-    -- 设置 可操作的牌
-    local handleCard1 = this.transform:Find('Canvas/PokerHandle/HandleCard1'):GetComponent("PageCurl")
-    handleCard1:ResetSprites(GameData.GetPokerCardBackSpriteNameOfBig(pokerCard1), GameData.GetPokerCardSpriteNameOfBig(pokerCard1))
-
-    local handleCard2 = this.transform:Find('Canvas/PokerHandle/HandleCard2'):GetComponent("PageCurl")
-    handleCard2:ResetSprites(GameData.GetPokerCardBackSpriteNameOfBig(pokerCard2), GameData.GetPokerCardSpriteNameOfBig(pokerCard2))
-    handleCard1.UserData = 4
-    handleCard1.gameObject:SetActive(false)
-    handleCard2.UserData = 5
-    handleCard2.gameObject:SetActive(false)
-    local pokerCard1Item = mPLAYERS_SOLT[5].Cards[4]
-    local pokerCard2Item = mPLAYERS_SOLT[5].Cards[5]
-    pokerCard1Item.gameObject:SetActive(true)
-    pokerCard2Item.gameObject:SetActive(true)
-
-    AddEventOfHandlePokerCard(handleCard1)
-    AddEventOfHandlePokerCard(handleCard2)
-    pokerCard1Item:GetComponent("Image"):ResetSpriteByName(GameData.GetPokerCardSpriteNameOfBig(pokerCard1))
-    pokerCard2Item:GetComponent("Image"):ResetSpriteByName(GameData.GetPokerCardSpriteNameOfBig(pokerCard2))
-    local handleJoint1 = this.transform:Find('Canvas/PokerHandle/Points/HandlePoint1')
-    local handleJoint2 = this.transform:Find('Canvas/PokerHandle/Points/HandlePoint2')
-    CheckStartAnimation(pokerCard1Item, mPLAYERS_SOLT[5].Points[4], handleJoint1, handleCard1, isAni)
-    CheckStartAnimation(pokerCard2Item, mPLAYERS_SOLT[5].Points[5], handleJoint2, handleCard2, isAni)
-    RefreshOpenPokerCardButtonState(true)
-    -- RefreshHandlePokerCardVisibleChanged(pokerIndex1, true)
-    -- RefreshHandlePokerCardVisibleChanged(pokerIndex2, true)
-end
-
--- 刷新开拍按钮状态
-function RefreshOpenPokerCardButtonState(isActive)
-
-    ShowOpenPokerButton(isActive)
-    isUpdateOpenPokerCountDown = isActive
-
-end
-
--- 更新玩家开牌按钮CD
-function UpdateOpenPokerCardCountDown()
-    if isUpdateOpenPokerCountDown == true then
-        local countDown = mRoomData.CountDown
-        if countDown < 0 then
-            countDown = 0
-        end
-        mButtonOpenText.text = lua_FormatToCountdownStyle(countDown)
-    end
-end
-
-function CheckStartAnimation(cardItem, from, to, handleCard, isAni)
-    handleCard.transform.position = to.position
-    if isAni then
-        local script = cardItem.gameObject:AddComponent(typeof(CS.UITweenTransform))
-        script.from = from
-        script.to = to
-        script.duration = 0.4
-        script:OnFinished("+",( function() CheckStartAnimationEnd(cardItem, script, handleCard) end))
-        script:Play(true)
-    else
-        lua_Paste_Transform_Value(cardItem, to)
-        CheckStartAnimationEnd(cardItem, script, handleCard)
-    end
-end
-
-function CheckStartAnimationEnd(cardItem, script, handleCard)
-    CS.UnityEngine.Object.Destroy(script)
-    cardItem.gameObject:SetActive(false)
-    handleCard.gameObject:SetActive(true)
-    handleCard:ResetPageCurl(444, 300, true, true)
-end
-
-function AddEventOfHandlePokerCard(handleCard)
-    handleCard:OpenCardCallBack('-', OpenOneCard)
-    handleCard:OpenCardCallBack('+', OpenOneCard)
-end
-
-function OpenOneCard(userData)
-    local pokerIndex = tonumber(userData)
-    -- 搓牌自己的4.5张
-    local index = pokerIndex
-    -- 4/5
-    local isLastOne = false
-
-    if index == 4 then
-        mRoomData.ZHUJUPlayerList[5].Pokers[4].Visible = true
-        local pokerCard = mRoomData.ZHUJUPlayerList[5].Pokers[pokerIndex + 1]
-        if (pokerCard.Visible) then
-            isLastOne = true
-        end
-    else
-        index = 5
-        mRoomData.ZHUJUPlayerList[5].Pokers[5].Visible = true
-        local pokerCard = mRoomData.ZHUJUPlayerList[5].Pokers[pokerIndex - 1]
-        if (pokerCard.Visible) then
-            isLastOne = true
-        end
-    end
-    if isLastOne then
-        NetMsgHandler.Send_CS_ZJRoom_CuoPai()
-        HandleOpenPokerCardAnimationStepOne()
-        ShowOpenPokerButton(false)
-    else
-
-    end
-end
-
-local isOpenPokerCardAnimation = false
-
--- 有玩家的开牌动画1
-function HandleOpenPokerCardAnimationStepOne()
-    isStartEnterCheckAnimation = false
-    isOpenPokerCardAnimation = true
-    for i = 1, 2, 1 do
-        local pokerIndex = i + 3
-        local pokerCard = mRoomData.ZHUJUPlayerList[5].Pokers[pokerIndex]
-        local cardItem = mPLAYERS_SOLT[5].Cards[pokerIndex]
-        SetTablePokerCardVisible(cardItem, true)
-        cardItem.gameObject:SetActive(true)
-        local pageCurl = this.transform:Find('Canvas/PokerHandle/HandleCard' .. i):GetComponent("PageCurl")
-        pageCurl.gameObject:SetActive(false)
-        lua_Clear_AllUITweener(cardItem)
-        if pageCurl.IsSpriteRotated then
-            cardItem.eulerAngles = CS.UnityEngine.Vector3(0, 0, 90)
-            local script = cardItem.gameObject:AddComponent(typeof(CS.UITweenRotation))
-            script.from = CS.UnityEngine.Vector3(0, 0, 90)
-            script.to = CS.UnityEngine.Vector3.zero
-            script.duration = 0.2
-            script:OnFinished("+",( function() CS.UnityEngine.Object.Destroy(script) end))
-            script:Play(true)
-        else
-            cardItem.eulerAngles = CS.UnityEngine.Vector3(0, 0, 0)
-        end
-    end
-    this:DelayInvoke(0.3, function() HandleOpenPokerCardAnimationStepTwo() end)
-end
-
--- 有玩家的开牌动画2
-function HandleOpenPokerCardAnimationStepTwo()
-    ---- 扑克牌飞回到原始位置
-    for i = 1, 2, 1 do
-        local pokerIndex = i + 3
-        local pokerCard = mRoomData.ZHUJUPlayerList[5].Pokers[pokerIndex]
-        local cardItem = mPLAYERS_SOLT[5].Cards[pokerIndex]
-        cardItem.gameObject:SetActive(true)
-        local script = cardItem.gameObject:AddComponent(typeof(CS.UITweenTransform))
-
-        script.to = mPLAYERS_SOLT[5].Points[pokerIndex]
-        script.duration = 0.3
-        script:OnFinished("+",
-        ( function()
-            CS.UnityEngine.Object.Destroy(script)
-            isOpenPokerCardAnimation = false
-            PlaySplitPokerCardsAnimation(5, true)
-        end ))
-        script:Play(true)
-    end
-    -- 搓牌还原
-    ShowPokerHandle(false)
-end
-
--- 玩家看牌按钮 call
-function OnKPButtonClick()
+function RefreshCardVSPartOfGameRoomByState( roomStateParam, initParam )
     -- body
-    print('看牌按钮点击')
 end
-
--- 看牌按钮显示设置
-function MasterKPButtonShow(showParam)
-    -- body
-    if mMasterXZInfo.KPButtonGameObject.activeSelf == showParam then
-        return
-    end
-    mMasterXZInfo.KPButtonGameObject:SetActive(showParam)
-end
-
--- ===============PK阶段===============--
 
 -- 设置VSPK显示
 function VSPKShow(showParam)
@@ -484,3 +366,10 @@ function VSPKShow(showParam)
     end
     mVSPK:SetActive(showParam)
 end
+
+-- ===============【结算阶段】【7】 ZUJURoomState.Settlement===============--
+
+function RefreshSettlementPartOfGameRoomByState( roomStateParam, initParam )
+    -- body
+end
+
