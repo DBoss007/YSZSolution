@@ -34,6 +34,7 @@ local PlayerItem =
     QPImage = nil,
     JZImage = nil,
     GZImage = nil,
+    ZBImage = nil,
 }
 
 -- 玩家UI元素集合
@@ -55,6 +56,12 @@ local mMasterXZInfo =
     -- 玩家自己筹码组件
     CMImageGameObject = nil,
 }
+
+local mBetChipAllInfo = 
+{
+    
+}
+
 
 -- 初始化UI元素
 function InitUIElement()
@@ -105,6 +112,7 @@ function InitPlayerUIElement()
         dataItem.QPImage = childItem:Find('QPImage')
         dataItem.JZImage = childItem:Find('JZImage')
         dataItem.GZImage = childItem:Find('GZImage')
+        dataItem.ZBImage = childItem:Find('ZBImage')
         -- 扑克牌挂接点
         for cardIndex = 1, 3, 1 do
             if dataItem.PokerPoints == nil then
@@ -134,6 +142,7 @@ function ResetPlayerInfo2Defaul(positionParam)
     mPlayersUIInfo[positionParam].QPImage.gameObject:SetActive(false)
     mPlayersUIInfo[positionParam].JZImage.gameObject:SetActive(false)
     mPlayersUIInfo[positionParam].GZImage.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].ZBImage.gameObject:SetActive(false)
     mPlayersUIInfo[positionParam].BankerTag.gameObject:SetActive(false)
 end
 
@@ -155,11 +164,6 @@ function SetPlayerBaseInfo(positionParam)
         SetPlayerHeadIcon(positionParam)
         SetPlayerGoldValue(positionParam)
     end
-end
-
-function SetPlayerHeadIcon(positionParam)
-    local PlayerInfo = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam]
-    mPlayersUIInfo[positionParam].HeadIcon:ResetSpriteByName(GameData.GetRoleIconSpriteName(PlayerInfo.IconID))
 end
 
 -- 设置指定玩家金币值
@@ -239,21 +243,20 @@ end
 function Start()
     -- body
     if GameData.RoomInfo.CurrentRoom.RoomID > 0 then
-        ResetGameRoomToRoomState(GameData.RoomInfo.CurrentRoom.RoomState)
+        ResetGameToRoomState(GameData.RoomInfo.CurrentRoom.RoomState)
     end
 end
 
 -- UI 开启
 function WindowOpened()
-    CS.EventDispatcher.Instance:AddEventListener(EventDefine.InitRoomState, ResetGameRoomToRoomState)
-    CS.EventDispatcher.Instance:AddEventListener(EventDefine.UpdateRoomState, RefreshGameRoomByRoomStateSwitchTo)
-
+    CS.EventDispatcher.Instance:AddEventListener(EventDefine.InitRoomState, ResetGameToRoomState)
+    CS.EventDispatcher.Instance:AddEventListener(EventDefine.UpdateRoomState, RefreshGameByRoomStateSwitchTo)
 end
 
 -- UI 关闭
 function WindowClosed()
-    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.InitRoomState, ResetGameRoomToRoomState)
-    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.UpdateRoomState, RefreshGameRoomByRoomStateSwitchTo)
+    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.InitRoomState, ResetGameToRoomState)
+    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.UpdateRoomState, RefreshGameByRoomStateSwitchTo)
 
 end
 
@@ -326,11 +329,11 @@ end
 
 -------------------------------按钮 call end--------------------------------------------------
 
-function ResetGameRoomToRoomState(currentState)
+function ResetGameToRoomState(currentState)
     canPlaySoundEffect = false
     -- 停止掉所有的协程
     this:StopAllDelayInvoke()
-    InitRoomBaseInfos()
+    -- InitRoomBaseInfos()
     RefreshGameRoomToEnterGameState(currentState, true)
     canPlaySoundEffect = true
 end
@@ -341,13 +344,13 @@ function RefreshGameRoomToEnterGameState(roomState, isInit)
         -- 调用下GC回收
         lua_Call_GC()
     end
-    RefreshStartPartOfGameRoomByState(roomState)
-    RefreshWaitPartOfGameRoomByState(roomState, isInit)
-    RefreshSubduceBetPartOfGameRoomByState(roomState, isInit)
-    RefreshDealPartOfGameRoomByState(roomState, isInit)
-    RefreshBettingPartOfGameRoomByState(roomState, isInit)
-    RefreshCardVSPartOfGameRoomByState(roomState, isInit)
-    RefreshSettlementPartOfGameRoomByState(roomState, isInit)
+    RefreshStartPartOfGameByRoomState(roomState)
+    RefreshWaitPartOfGameByRoomState(roomState, isInit)
+    RefreshSubduceBetPartOfGameByRoomState(roomState, isInit)
+    RefreshDealPartOfGameByRoomState(roomState, isInit)
+    RefreshBettingPartOfGameByRoomState(roomState, isInit)
+    RefreshCardVSPartOfGameByRoomState(roomState, isInit)
+    RefreshSettlementPartOfGameByRoomState(roomState, isInit)
 end
 
 -- 初始化房间到初始状态
@@ -360,39 +363,124 @@ function InitRoomBaseInfos(roomStateParam)
     end
 end
 
+-- 游戏状态变化音效播放接口
+function PlaySoundEffect(musicid)
+    if true == canPlaySoundEffect then
+        MusicMgr:PlaySoundEffect(musicid)
+    end
+end
 
 -- ===============【等待开局】【1】ZUJURoomState.Start===============--
 -- 等待游戏开局
-function RefreshStartPartOfGameRoomByState(roomStateParam, initParam)
+function RefreshStartPartOfGameByRoomState(roomStateParam, initParam)
     -- body
     if roomStateParam == ZUJURoomState.Start then
         -- body
+        for position = 1, 5, 1 do
+            ResetPlayerInfo2Defaul(position)
+            SetPlayerSitdownState(position)
+            SetPlayerBaseInfo(position)
+        end
     end
 end
 
 -- ===============【等待准备】【2】 ZUJURoomState.Wait===============--
 
-function RefreshWaitPartOfGameRoomByState(roomStateParam, initParam)
+function RefreshWaitPartOfGameByRoomState(roomStateParam, initParam)
     -- body
+    if roomStateParam == ZUJURoomState.Wait then
+        -- body
+        for position = 1, 5, 1 do
+            local PlayerState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState
+            if PlayerState ~= Player_State.JoinOK then
+                -- body
+                mPlayersUIInfo[position].ZBImage.gameObject:SetActive(true)
+            end
+        end
+    else
+        -- 准备状态还原
+        for position = 1, 5, 1 do
+            local PlayerState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState
+            mPlayersUIInfo[position].ZBImage.gameObject:SetActive(false)
+        end
+    end
+
 end
 
 -- ===============【收取底注】【3】 ZUJURoomState.SubduceBet===============--
 
-function RefreshSubduceBetPartOfGameRoomByState(roomStateParam, initParam)
+function RefreshSubduceBetPartOfGameByRoomState(roomStateParam, initParam)
     -- body
+    if roomStateParam == ZUJURoomState.SubduceBet then
+
+    elseif roomStateParam > ZUJURoomState.SubduceBet and initParam == true then
+        -- 收取底注状态之后进入游戏
+
+    else
+
+    end
+end
+
+-- 刷新已经下注金额
+function RefreshAllBets()
+
+
+
+end
+
+-- 押注筹码到桌子上
+function BetChipToDesk(betValueParam, positionParam)
+    local startPoint = nil
+    if roleID == GameData.RoleInfo.AccountID then
+        -- 如果是自己，则从自己点开始， 否则从其他玩家点开始
+        startPoint = CHIP_JOINTS[11]
+    else
+        startPoint = CHIP_JOINTS[12]
+    end
+
+    CastChipToBetArea(areaType, betValue, tostring(roleID), true, startPoint.JointPoint.position)
+
+    -- 押注筹码音效
+    PlaySoundEffect(5)
+end
+
+-- 向押注区域投掷筹码
+function CastChipToBetArea(areaType, chipValue, chipName, isAnimation, fromWorldPoint)
+	local model = CHIP_MODEL[chipValue]
+	if model ~= nil then
+		local betChip = CS.UnityEngine.Object.Instantiate(model)
+		betChip.gameObject.name = chipName
+		local areaInfo = CHIP_JOINTS[areaType]
+		CS.Utility.ReSetTransform(betChip, areaInfo.JointPoint)
+		local toLocalPoint = lua_RandomXYOfVector3(areaInfo.RangeX.Min, areaInfo.RangeX.Max, areaInfo.RangeY.Min, areaInfo.RangeY.Max)
+		betChip.gameObject:SetActive(true)
+		if isAnimation then
+			betChip.position = fromWorldPoint
+			local script = betChip:GetComponent("TweenPosition")
+			script.from = betChip.localPosition
+			script.to = toLocalPoint
+			script.worldSpace = false
+			script:ResetToBeginning()
+			script:Play(true)
+		else
+			betChip.localPosition = toLocalPoint
+		end
+	end
 end
 
 -- ===============【洗牌发牌】【4】 ZUJURoomState.Deal===============--
 
-function RefreshDealPartOfGameRoomByState(roomStateParam, initParam)
+function RefreshDealPartOfGameByRoomState(roomStateParam, initParam)
     -- body
 end
 
 -- ===============【下注阶段】【5】 ZUJURoomState.Betting===============--
 
-function RefreshBettingPartOfGameRoomByState(roomStateParam, initParam)
+function RefreshBettingPartOfGameByRoomState(roomStateParam, initParam)
     -- body
 end
+
+
 
 -- ===============弃牌、加注、跟注、比牌===============--
 
@@ -474,7 +562,7 @@ end
 -- ===============【比牌阶段】【6】 ZUJURoomState.CardVS===============--
 
 
-function RefreshCardVSPartOfGameRoomByState(roomStateParam, initParam)
+function RefreshCardVSPartOfGameByRoomState(roomStateParam, initParam)
     -- body
 end
 
@@ -489,7 +577,7 @@ end
 
 -- ===============【结算阶段】【7】 ZUJURoomState.Settlement===============--
 
-function RefreshSettlementPartOfGameRoomByState(roomStateParam, initParam)
+function RefreshSettlementPartOfGameByRoomState(roomStateParam, initParam)
     -- body
 end
 
