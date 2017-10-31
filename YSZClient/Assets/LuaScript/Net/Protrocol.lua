@@ -95,6 +95,7 @@ ProtrocolID =
     S_JH_Next_State                          = 805,  -- 组局厅通知房间下一阶段
     S_JH_Add_Player                          = 806,  -- 组局厅通知新增一个玩家
     S_JH_Delete_Player                       = 807,  -- 组局厅通知删除一个玩家
+    CS_JH_Exit_Room                          = 808,  -- 组局厅请求离开房间(以及反馈)
     
 
 

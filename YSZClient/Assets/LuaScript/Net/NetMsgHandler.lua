@@ -237,6 +237,7 @@ function NetMsgHandler.InitLoginNetClient()
     loginNetClient:RegisterParser(ProtrocolID.S_JH_Next_State, NetMsgHandler.Received_S_JH_Next_State)
     loginNetClient:RegisterParser(ProtrocolID.S_JH_Add_Player, NetMsgHandler.Received_S_JH_Add_Player)
     loginNetClient:RegisterParser(ProtrocolID.S_JH_Delete_Player, NetMsgHandler.Received_S_JH_Delete_Player)
+    loginNetClient:RegisterParser(ProtrocolID.CS_JH_Exit_Room, NetMsgHandler.Received_CS_JH_Exit_Room)
 
 end
 
@@ -2220,11 +2221,11 @@ function NetMsgHandler.Received_S_Update_Pomoter(message)
     end
 end
 
---===========================================================================--
---=============================CS_JH_Create_Room 801=========================--
+-- ===========================================================================--
+-- =============================CS_JH_Create_Room 801=========================--
 
 -- 组局厅请求创建房间(底注 下注上限 陌生人加入 游戏模式(经典 激情):1 2 必闷N圈:1 3 入场金币:100 离场金币:20)
-function NetMsgHandler.Send_CS_JH_Create_Room(betMinParam, betMaxParam,isLockParam,roomTypeParam,menTimesParam,enterBetParam, quitBetParam)
+function NetMsgHandler.Send_CS_JH_Create_Room(betMinParam, betMaxParam, isLockParam, roomTypeParam, menTimesParam, enterBetParam, quitBetParam)
     -- body
     local message = CS.Net.PushMessage()
     message:PushUInt32(betMinParam)
@@ -2234,13 +2235,13 @@ function NetMsgHandler.Send_CS_JH_Create_Room(betMinParam, betMaxParam,isLockPar
     message:PushByte(menTimesParam)
     message:PushUInt32(enterBetParam)
     message:PushUInt32(quitBetParam)
-    
+
     NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Create_Room, message, true)
-    print(string.format( "-----Min:%d Max:%d Lock:%d RoomType:%d MenJi:%d EnterBet:%d QuitBet:%d",betMinParam, betMaxParam,isLockParam,roomTypeParam,menTimesParam,enterBetParam, quitBetParam))
+    print(string.format("-----Min:%d Max:%d Lock:%d RoomType:%d MenJi:%d EnterBet:%d QuitBet:%d", betMinParam, betMaxParam, isLockParam, roomTypeParam, menTimesParam, enterBetParam, quitBetParam))
 end
 
 -- 组局厅请求创建房间反馈
-function NetMsgHandler.Received_CS_JH_Create_Room( message )
+function NetMsgHandler.Received_CS_JH_Create_Room(message)
     -- body
     local resultType = message:PopByte()
     if resultType == 0 then
@@ -2252,24 +2253,24 @@ function NetMsgHandler.Received_CS_JH_Create_Room( message )
     else
         CS.BubblePrompt.Show(data.GetString("JH_Create_Room_Error_" .. resultType), "HallUI")
     end
-    print("=====CS_JH_Create_Room Result:"..resultType)
+    print("=====CS_JH_Create_Room Result:" .. resultType)
 end
 
---===========================================================================--
---=============================CS_JH_Enter_Room1 802=========================--
+-- ===========================================================================--
+-- =============================CS_JH_Enter_Room1 802=========================--
 
 -- 组局厅请求进入房间1
-function NetMsgHandler.Send_CS_JH_Enter_Room1( roomIDParam )
+function NetMsgHandler.Send_CS_JH_Enter_Room1(roomIDParam)
     -- body
     local message = CS.Net.PushMessage()
     message:PushUInt32(GameData.RoleInfo.AccountID)
     message:PushUInt32(roomIDParam)
     NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Enter_Room1, message, true)
-    print("-----CS_JH_Enter_Room1 ID:"..roomIDParam)
+    print("-----CS_JH_Enter_Room1 ID:" .. roomIDParam)
 end
 
 -- 组局厅请求进入组局房间
-function NetMsgHandler.Received_CS_JH_Enter_Room1( message )
+function NetMsgHandler.Received_CS_JH_Enter_Room1(message)
     -- body
     local resultType = message:PopByte()
     if resultType == 0 then
@@ -2277,26 +2278,26 @@ function NetMsgHandler.Received_CS_JH_Enter_Room1( message )
     else
         CS.BubblePrompt.Show(data.GetString("JH_Enter_Room1_Error_" .. resultType), "HallUI")
     end
-    print("=====CS_JH_Enter_Room1 Result:"..resultType)
+    print("=====CS_JH_Enter_Room1 Result:" .. resultType)
 end
 
---===========================================================================--
---=============================CS_JH_Enter_Room2 803=========================--
+-- ===========================================================================--
+-- =============================CS_JH_Enter_Room2 803=========================--
 
 -- 组局厅请求进入房间1
-function NetMsgHandler.Send_CS_JH_Enter_Room2( roomTypeParam )
+function NetMsgHandler.Send_CS_JH_Enter_Room2(roomTypeParam)
     -- body
     local message = CS.Net.PushMessage()
     message:PushUInt32(GameData.RoleInfo.AccountID)
     message:PushByte(roomTypeParam)
     NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Enter_Room2, message, true)
-    print("-----CS_JH_Enter_Room2 ID:"..roomTypeParam)
+    print("-----CS_JH_Enter_Room2 ID:" .. roomTypeParam)
 
 end
 
 
 -- 组局厅请求进入闷鸡房间2
-function NetMsgHandler.Received_CS_JH_Enter_Room2( message )
+function NetMsgHandler.Received_CS_JH_Enter_Room2(message)
     -- body
     local resultType = message:PopByte()
     if resultType == 0 then
@@ -2306,16 +2307,16 @@ function NetMsgHandler.Received_CS_JH_Enter_Room2( message )
     end
 end
 
---============================================================================--
---=============================S_JH_Set_Game_Data 804=========================--
+-- ============================================================================--
+-- =============================S_JH_Set_Game_Data 804=========================--
 
 -- 组局厅反馈房间详细信息
-function NetMsgHandler.Received_S_JH_Set_Game_Data( message )
+function NetMsgHandler.Received_S_JH_Set_Game_Data(message)
     -- body
     NetMsgHandler.ParseJHRoomBaseInfo(message)
     NetMsgHandler.ParseJHRoomPlayersInfo(message)
     NetMsgHandler.ParseAllBetInfo(message)
-    
+
     CS.EventDispatcher.Instance:TriggerEvent(EventDefine.InitRoomState, GameData.RoomInfo.CurrentRoom.RoomState)
     -- 进入游戏房间
     local openparam = CS.WindowNodeInitParam("GameUI1")
@@ -2331,7 +2332,7 @@ function NetMsgHandler.Received_S_JH_Set_Game_Data( message )
 end
 
 -- 解析房间基础信息
-function NetMsgHandler.ParseJHRoomBaseInfo( message )
+function NetMsgHandler.ParseJHRoomBaseInfo(message)
     -- body
     GameData.RoomInfo.CurrentRoom.RoomID = message:PopUInt32()
     GameData.RoomInfo.CurrentRoom.MasterID = message:PopUInt32()
@@ -2339,24 +2340,24 @@ function NetMsgHandler.ParseJHRoomBaseInfo( message )
     GameData.RoomInfo.CurrentRoom.SmallType = message:PopByte()
     GameData.RoomInfo.CurrentRoom.GameMode = message:PopByte()
     GameData.RoomInfo.CurrentRoom.GameRule = message:PopByte()
-    GameData.RoomInfo.CurrentRoom.BetMin  = message:PopUInt32()
-    GameData.RoomInfo.CurrentRoom.BetMax  = message:PopUInt32()
-    GameData.RoomInfo.CurrentRoom.RoomState  = message:PopByte()
+    GameData.RoomInfo.CurrentRoom.BetMin = message:PopUInt32()
+    GameData.RoomInfo.CurrentRoom.BetMax = message:PopUInt32()
+    GameData.RoomInfo.CurrentRoom.RoomState = message:PopByte()
     GameData.RoomInfo.CurrentRoom.CountDown = message:PopUInt32() / 1000.0
-    GameData.RoomInfo.CurrentRoom.SelfPosition = message:PopByte()    
+    GameData.RoomInfo.CurrentRoom.SelfPosition = message:PopByte()
     local BankerPosition = message:PopByte()
     GameData.RoomInfo.CurrentRoom.BetAllValue = message:PopInt64()
-    GameData.RoomInfo.CurrentRoom.RoundTimes  = message:PopByte()
+    GameData.RoomInfo.CurrentRoom.RoundTimes = message:PopByte()
     -- 位置转换
     GameData.RoomInfo.CurrentRoom.BankerPosition = GameData.PlayerPositionConvert2ShowPosition(BankerPosition)
 end
 
 -- 解析房间玩家列表
-function NetMsgHandler.ParseJHRoomPlayersInfo( message )
+function NetMsgHandler.ParseJHRoomPlayersInfo(message)
     -- body
     local playerCount = message:PopUInt16()
 
-    for index = 1 ,playerCount, 1 do
+    for index = 1, playerCount, 1 do
         local playerID = message:PopUInt32()
         local Name = message:PopString()
         local HeadIcon = message:PopByte()
@@ -2364,12 +2365,12 @@ function NetMsgHandler.ParseJHRoomPlayersInfo( message )
         local GoldValue = message:PopInt64()
         local severposition = message:PopByte()
         local PlayerState = message:PopByte()
-        local CheckState= message:PopByte()
+        local CheckState = message:PopByte()
         local FoldState = message:PopByte()
         local CompareState = message:PopByte()
         local CompareResult = message:PopByte()
 
-        local position  = GameData.PlayerPositionConvert2ShowPosition(severposition)
+        local position = GameData.PlayerPositionConvert2ShowPosition(severposition)
         GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].AccountID = playerID
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Name = Name
@@ -2382,7 +2383,7 @@ function NetMsgHandler.ParseJHRoomPlayersInfo( message )
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CompareState = CompareState
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CompareResult = CompareResult
         -- 扑克牌解析
-        local cardCount  = message:PopUInt16()
+        local cardCount = message:PopUInt16()
         for cardIndex = 1, cardCount, 1 do
             PokerType = message:PopByte()
             PokerNumber = message:PopByte()
@@ -2395,19 +2396,19 @@ function NetMsgHandler.ParseJHRoomPlayersInfo( message )
 end
 
 -- 解析当前所有下注情况
-function NetMsgHandler.ParseAllBetInfo( message )
+function NetMsgHandler.ParseAllBetInfo(message)
     -- body
-    local betCount  = message:PopUInt16()
+    local betCount = message:PopUInt16()
     for index = 1, betCount, 1 do
         local position = message:PopByte()
-        local betValue  = message:PopInt64()
-        local BetInfo  = { Position = position, BetValue = betValue }
+        local betValue = message:PopInt64()
+        local BetInfo = { Position = position, BetValue = betValue }
         GameData.RoomInfo.CurrentRoom.AllBetInfo[index] = BetInfo
     end
 end
 
 -- 解析当前结算信息
-function NetMsgHandler.ParseGameResultInfo( message )
+function NetMsgHandler.ParseGameResultInfo(message)
     -- body
     -- 赢家ID
     local WinnerID = message:PopUInt32()
@@ -2427,9 +2428,9 @@ function NetMsgHandler.ParseGameResultInfo( message )
 
     local showCount = message:PopUInt16()
     for i = 1, showCount, 1 do
-        local showPosition  = message:PopByte()
+        local showPosition = message:PopByte()
         showPosition = GameData.PlayerPositionConvert2ShowPosition(showPosition)
-        local cardCount  = message:PopUInt16()
+        local cardCount = message:PopUInt16()
         for cardIndex = 1, cardCount, 1 do
             GameData.RoomInfo.CurrentRoom.ZUJUPlayers[showPosition].PokerList[cardIndex].PokerType = message:PopByte()
             GameData.RoomInfo.CurrentRoom.ZUJUPlayers[showPosition].PokerList[cardIndex].PokerNumber = message:PopByte()
@@ -2438,29 +2439,51 @@ function NetMsgHandler.ParseGameResultInfo( message )
     end
 end
 
---============================================================================--
---=============================S_JH_Next_State 805=========================--
+-- ============================================================================--
+-- =============================S_JH_Next_State 805=========================--
 
 -- 组局厅通知房间下一阶段
-function NetMsgHandler.Received_S_JH_Next_State( message )
+function NetMsgHandler.Received_S_JH_Next_State(message)
     -- body
-    
+
 
 end
 
---============================================================================--
---=============================S_JH_Next_State 806=========================--
+-- ============================================================================--
+-- =============================S_JH_Next_State 806=========================--
 
 -- 组局厅通知新增一个玩家
-function NetMsgHandler.Received_S_JH_Add_Player( message )
+function NetMsgHandler.Received_S_JH_Add_Player(message)
     -- body
 end
 
---============================================================================--
---=============================S_JH_Delete_Player 807=========================--
+-- ============================================================================--
+-- =============================S_JH_Delete_Player 807=========================--
 
 -- 组局厅通知删除一个玩家
-function NetMsgHandler.Received_S_JH_Delete_Player( message )
+function NetMsgHandler.Received_S_JH_Delete_Player(message)
     -- body
+end
+
+-- ============================================================================--
+-- =============================CS_JH_Exit_Room 808=========================--
+
+-- 组局厅请求离开房间
+function NetMsgHandler.Send_CS_JH_Exit_Room(rooIDParam)
+    local message = CS.Net.PushMessage()
+    message:PushUInt32(GameData.RoleInfo.AccountID)
+    message:PushUInt32(rooIDParam)
+    NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Exit_Room, message, true)
+    print("-----CS_JH_Exit_Room ID:" .. roomTypeParam)
+end
+
+-- 组局厅请求离开房间反馈
+function NetMsgHandler.Received_CS_JH_Exit_Room(message)
+    local resultType = message:PopByte()
+    if resultType == 0 then
+
+    else
+        CS.BubblePrompt.Show(data.GetString("CS_JH_Exit_Room_Error_" .. resultType), "GameUI1")
+    end
 end
 
