@@ -55,6 +55,17 @@ local mMasterXZInfo =
     JZButton4Text = nil,
     -- 玩家自己筹码组件
     CMImageGameObject = nil,
+    -- 玩家准备按钮组件
+    ZBButtonGameObject = nil
+}
+
+local CHIP_JOINTS =
+{
+[1] = { JointPoint = nil, RangeX = { Min = - 200, Max = 200 }, RangeY = { Min = - 150, Max = 150 } },
+[2] = { JointPoint = nil, RangeX = { Min = - 140, Max = 140 }, RangeY = { Min = - 70, Max = 70 } },
+[3] = { JointPoint = nil, RangeX = { Min = - 130, Max = 130 }, RangeY = { Min = - 70, Max = 70 } },
+[4] = { JointPoint = nil, RangeX = { Min = - 200, Max = 200 }, RangeY = { Min = - 120, Max = 100 } },
+[5] = { JointPoint = nil, RangeX = { Min = - 200, Max = 200 }, RangeY = { Min = -120, Max = 100 } },
 }
 
 local mBetChipAllInfo = 
@@ -81,11 +92,13 @@ function InitUIElement()
     mMasterXZInfo.KPButtonGameObject = this.transform:Find('Canvas/MasterInfo/KPButton').gameObject
     mMasterXZInfo.XZButtonGameObject = this.transform:Find('Canvas/MasterInfo/Buttons').gameObject
     mMasterXZInfo.JZButtonGameObject = this.transform:Find('Canvas/MasterInfo/JZInfo').gameObject
+    mMasterXZInfo.ZBButtonGameObject = this.transform:Find('Canvas/MasterInfo/Buttons/ZBButton').gameObject
     mMasterXZInfo.JZButton1Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton1/Text'):GetComponent('Text')
     mMasterXZInfo.JZButton2Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton2/Text'):GetComponent('Text')
     mMasterXZInfo.JZButton3Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton3/Text'):GetComponent('Text')
     mMasterXZInfo.JZButton4Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton4/Text'):GetComponent('Text')
     mMasterXZInfo.CMImageGameObject = this.transform:Find('Canvas/Players/Player5/CMImage').gameObject
+    
 
 end
 
@@ -251,12 +264,18 @@ end
 function WindowOpened()
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.InitRoomState, ResetGameToRoomState)
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.UpdateRoomState, RefreshGameByRoomStateSwitchTo)
+
+    CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUPlayerReadyStateEvent, OnNotifyZUJUPlayerReadyStateEvent)
+
 end
 
 -- UI 关闭
 function WindowClosed()
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.InitRoomState, ResetGameToRoomState)
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.UpdateRoomState, RefreshGameByRoomStateSwitchTo)
+
+    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUPlayerReadyStateEvent, OnNotifyZUJUPlayerReadyStateEvent)
+    
 
 end
 
@@ -281,11 +300,15 @@ function AddButtonHandlers()
     this.transform:Find('Canvas/MasterInfo/Buttons/JZButton'):GetComponent('Button').onClick:AddListener(OnJZButtonClick)
     this.transform:Find('Canvas/MasterInfo/Buttons/GZButton'):GetComponent('Button').onClick:AddListener(OnGZButtonClick)
     this.transform:Find('Canvas/MasterInfo/Buttons/BPButton'):GetComponent('Button').onClick:AddListener(OnBPButtonClick)
+    this.transform:Find('Canvas/MasterInfo/Buttons/ZBButton'):GetComponent('Button').onClick:AddListener(OnZBButtonClick)
+
     this.transform:Find('Canvas/MasterInfo/JZInfo'):GetComponent('Button').onClick:AddListener(OnJZHideClick)
     this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton1'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(1) end)
     this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton2'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(2) end)
     this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton3'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(3) end)
     this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton4'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(4) end)
+
+    
 
 end
 
@@ -336,6 +359,11 @@ function ResetGameToRoomState(currentState)
     -- InitRoomBaseInfos()
     RefreshGameRoomToEnterGameState(currentState, true)
     canPlaySoundEffect = true
+end
+
+-- 游戏状态切换
+function RefreshGameByRoomStateSwitchTo(roomState)
+    RefreshGameRoomToEnterGameState(roomState, false)
 end
 
 -- 刷新游戏房间到游戏状态
@@ -397,15 +425,53 @@ function RefreshWaitPartOfGameByRoomState(roomStateParam, initParam)
                 mPlayersUIInfo[position].ZBImage.gameObject:SetActive(true)
             end
         end
+        RefreshZBButtonShow()
     else
         -- 准备状态还原
         for position = 1, 5, 1 do
             local PlayerState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState
             mPlayersUIInfo[position].ZBImage.gameObject:SetActive(false)
         end
+        SetZBButtonShow(false)
     end
 
 end
+
+-- 玩家准备按钮call
+function OnZBButtonClick()
+    NetMsgHandler.Send_CS_JH_Ready(1)
+end
+
+-- 准备按钮显示设置
+function SetZBButtonShow(showParam)
+    if mMasterXZInfo.ZBButtonGameObject.activeSelf == showParam then
+        return
+    end
+    mMasterXZInfo.ZBButtonGameObject:SetActive(showParam)
+end
+
+-- 刷新准备按钮显示
+function RefreshZBButtonShow()
+    local selfState  = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].PlayerState
+    if selfState ~= Player_State.JoinOK then
+        SetZBButtonShow(false)
+    else
+        local PlayerState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState
+        mPlayersUIInfo[position].ZBImage.gameObject:SetActive(false)
+    end
+
+end
+
+-- 通知玩家准备状态
+function OnNotifyZUJUPlayerReadyStateEvent(positionParam)
+    if positionParam == 5 then
+        SetZBButtonShow(false)
+    end
+
+    local ReadyState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam].ReadyState
+    mPlayersUIInfo[position].ZBImage.gameObject:SetActive(ReadyState == 1)
+end
+
 
 -- ===============【收取底注】【3】 ZUJURoomState.SubduceBet===============--
 

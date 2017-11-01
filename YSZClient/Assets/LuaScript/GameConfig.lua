@@ -14,8 +14,8 @@ GameConfig =
     -- 邀请好友一起玩游戏url
     InviteUrl = "http://jhysz.api.changlaith.com/downpage/main.php",
 
-    -- 连接的HubServerURL 域名(正式服务器:clysz.hub.changlaith.com 苹果审核域名:jhysz.v10101hub.changlaith.com 本地服务器:192.168.1.3)
-    HubServerURL = "118.190.159.166",
+    -- 连接的HubServerURL 域名(正式服务器:clysz.hub.changlaith.com 苹果审核域名:jhysz.v10101hub.changlaith.com 本地服务器:10.8.3.123，外网测试服:118.190.159.166)
+    HubServerURL = "10.8.3.234",
     GameServerURL = "jhysz.s10.changlaith.com",
     -- 链接服务器地址 由服务器下发
     HubServerPort = 20000,
@@ -151,6 +151,11 @@ EventDefine =
     NotifyPlayerYuYinChat = "NotifyPlayerYuYinChat",
     -- 游客登录开关检测通知
     NotifyVisitorCheckEvent = "NotifyVisitorCheckEvent",
+
+    -- 组局厅玩家准备状态通知
+    NotifyZUJUPlayerReadyStateEvent = "NotifyZUJUPlayerReadyStateEvent",
+    -- 组局厅添加玩家通知
+    NotifyZUJUAddPlayerEvent = "NotifyZUJUAddPlayerEvent",
 
 }
 
@@ -471,7 +476,7 @@ ZUJURoomState =
 }
 
 -- 百人厅 各房间状态CD时间
-ROOM_TIME =
+ZUJUROOM_TIME =
 {
     [ZUJURoomState.Start] = 9,
     [ZUJURoomState.Wait] = 5,

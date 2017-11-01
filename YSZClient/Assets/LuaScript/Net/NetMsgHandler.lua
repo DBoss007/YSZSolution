@@ -229,7 +229,7 @@ function NetMsgHandler.InitLoginNetClient()
     loginNetClient:RegisterParser(ProtrocolID.CS_Invite_Code, NetMsgHandler.Received_CS_Invite_Code)
     loginNetClient:RegisterParser(ProtrocolID.S_Update_Promoter, NetMsgHandler.Received_S_Update_Pomoter)
 
-    -- 801--807
+    -- 801--809
     loginNetClient:RegisterParser(ProtrocolID.CS_JH_Create_Room, NetMsgHandler.Received_CS_JH_Create_Room)
     loginNetClient:RegisterParser(ProtrocolID.CS_JH_Enter_Room1, NetMsgHandler.Received_CS_JH_Enter_Room1)
     loginNetClient:RegisterParser(ProtrocolID.CS_JH_Enter_Room2, NetMsgHandler.Received_CS_JH_Enter_Room2)
@@ -238,6 +238,9 @@ function NetMsgHandler.InitLoginNetClient()
     loginNetClient:RegisterParser(ProtrocolID.S_JH_Add_Player, NetMsgHandler.Received_S_JH_Add_Player)
     loginNetClient:RegisterParser(ProtrocolID.S_JH_Delete_Player, NetMsgHandler.Received_S_JH_Delete_Player)
     loginNetClient:RegisterParser(ProtrocolID.CS_JH_Exit_Room, NetMsgHandler.Received_CS_JH_Exit_Room)
+    loginNetClient:RegisterParser(ProtrocolID.CS_JH_Ready, NetMsgHandler.Received_CS_JH_Ready)
+
+    
 
 end
 
@@ -879,6 +882,7 @@ function NetMsgHandler.Received_CS_Enter_Room(message)
         else
             -- 正常流程
             -- print("正常进房间")
+            GameData.InitCurrentRoomInfo(ROOM_TYPE.JH_JuLong)
             GameData.RoomInfo.CurrentRoom.RoomID = message:PopUInt32()
             GameData.RoomInfo.CurrentRoom.TemplateID = message:PopByte()
 
@@ -2226,8 +2230,9 @@ end
 
 -- 组局厅请求创建房间(底注 下注上限 陌生人加入 游戏模式(经典 激情):1 2 必闷N圈:1 3 入场金币:100 离场金币:20)
 function NetMsgHandler.Send_CS_JH_Create_Room(betMinParam, betMaxParam, isLockParam, roomTypeParam, menTimesParam, enterBetParam, quitBetParam)
-    -- body
+        -- body
     local message = CS.Net.PushMessage()
+    message:PushUInt32(GameData.RoleInfo.AccountID)
     message:PushUInt32(betMinParam)
     message:PushUInt32(betMaxParam)
     message:PushByte(isLockParam)
@@ -2237,7 +2242,7 @@ function NetMsgHandler.Send_CS_JH_Create_Room(betMinParam, betMaxParam, isLockPa
     message:PushUInt32(quitBetParam)
 
     NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Create_Room, message, true)
-    print(string.format("-----Min:%d Max:%d Lock:%d RoomType:%d MenJi:%d EnterBet:%d QuitBet:%d", betMinParam, betMaxParam, isLockParam, roomTypeParam, menTimesParam, enterBetParam, quitBetParam))
+    print(string.format("-----Account:%d Min:%d Max:%d Lock:%d RoomType:%d MenJi:%d EnterBet:%d QuitBet:%d", GameData.RoleInfo.AccountID, betMinParam, betMaxParam, isLockParam, roomTypeParam, menTimesParam, enterBetParam, quitBetParam))
 end
 
 -- 组局厅请求创建房间反馈
@@ -2316,6 +2321,9 @@ function NetMsgHandler.Received_S_JH_Set_Game_Data(message)
     NetMsgHandler.ParseJHRoomBaseInfo(message)
     NetMsgHandler.ParseJHRoomPlayersInfo(message)
     NetMsgHandler.ParseAllBetInfo(message)
+    NetMsgHandler.ParseGameResultInfo(message)
+
+    
 
     CS.EventDispatcher.Instance:TriggerEvent(EventDefine.InitRoomState, GameData.RoomInfo.CurrentRoom.RoomState)
     -- 进入游戏房间
@@ -2445,8 +2453,71 @@ end
 -- 组局厅通知房间下一阶段
 function NetMsgHandler.Received_S_JH_Next_State(message)
     -- body
+    local RoomState = message:PopByte()
+    if RoomState == ZUJURoomState.Start then
+        -- 等待开始
+        NetMsgHandler.ParseZUJURoomStateSwitchToStart(message)
+    elseif RoomState == ZUJURoomState.Wait then
+        -- 准备阶段
+        NetMsgHandler.ParseZUJURoomStateSwitchToWait(message)
+    elseif RoomState == ZUJURoomState.SubduceBet then
+        -- 扣除底注
+        NetMsgHandler.ParseZUJURoomStateSwitchToSubduceBet(message)
+    elseif RoomState == ZUJURoomState.Deal then
+        -- 发牌
+        NetMsgHandler.ParseZUJURoomStateSwitchToDeal(message)
+    elseif RoomState == ZUJURoomState.Betting then
+        -- 下注
+        NetMsgHandler.ParseZUJURoomStateSwitchToBetting(message)
+    elseif RoomState == ZUJURoomState.CardVS then
+        -- 比牌
+        NetMsgHandler.ParseZUJURoomStateSwitchToCardVS(message)
+    else
+        -- Settlement 结算
+        NetMsgHandler.ParseZUJURoomStateSwitchToSettlement(message)
+    end 
+
+    GameData.SetZUJURoomState(RoomState)
+end
+
+-- 等待开始阶段解析
+function NetMsgHandler.ParseZUJURoomStateSwitchToStart(message)
+
+end
+
+-- 准备阶段解析
+function NetMsgHandler.ParseZUJURoomStateSwitchToWait(message)
+
+end
+
+-- 扣除底注阶段解析
+function NetMsgHandler.ParseZUJURoomStateSwitchToSubduceBet(message)
+    local playerCount = message:PopUInt16()
+    for index = 1, playerCount, 1 do
 
 
+    end
+
+end
+
+-- 发牌阶段解析
+function NetMsgHandler.ParseZUJURoomStateSwitchToDeal(message)
+
+end
+
+-- 下注阶段解析
+function NetMsgHandler.ParseZUJURoomStateSwitchToBetting(message)
+
+end
+
+-- 比牌阶段解析
+function NetMsgHandler.ParseZUJURoomStateSwitchToCardVS(message)
+    
+end
+
+-- 结算状态解析
+function NetMsgHandler.ParseZUJURoomStateSwitchToSettlement(message)
+    
 end
 
 -- ============================================================================--
@@ -2455,6 +2526,26 @@ end
 -- 组局厅通知新增一个玩家
 function NetMsgHandler.Received_S_JH_Add_Player(message)
     -- body
+    local position = message:PopByte()
+    position = GameData.PlayerPositionConvert2ShowPosition(position)
+    local Name = message:PopString()
+
+    --local playerID = message:PopUInt32()
+    local Name = message:PopString()
+    local HeadIcon = message:PopByte()
+    local HeadUrl = message:PopString()
+    local GoldValue = message:PopInt64()
+    local PlayerState = message:PopByte()
+
+    GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
+    --GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].AccountID = playerID
+    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Name = Name
+    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].HeadIcon = HeadIcon
+    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].HeadUrl = HeadUrl
+    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].GoldValue = GoldValue
+    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Position = position
+    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState = PlayerState
+
 end
 
 -- ============================================================================--
@@ -2484,6 +2575,33 @@ function NetMsgHandler.Received_CS_JH_Exit_Room(message)
 
     else
         CS.BubblePrompt.Show(data.GetString("CS_JH_Exit_Room_Error_" .. resultType), "GameUI1")
+    end
+    CS.LoadingDataUI.Hide()
+end
+
+-- ============================================================================--
+-- =============================CS_JH_Ready 809=========================--
+
+-- 组局厅玩家开始准备
+function NetMsgHandler.Send_CS_JH_Ready(readyParam)
+    local message = CS.Net.PushMessage()
+    message:PushUInt32(GameData.RoleInfo.AccountID)
+    message:PushByte(readyParam)
+    NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Ready, message)
+    print("-----CS_JH_Ready ID:" .. readyParam)
+end
+
+-- 组局厅玩家准备反馈
+function NetMsgHandler.Received_CS_JH_Ready(message)
+    local resultType = message:PopByte()
+    if resultType == 0 then
+        local position = message:PopByte()
+        local readyState = message:PopByte()
+        position = GameData.PlayerPositionConvert2ShowPosition(position)
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].ReadyState = message:PopByte()
+        CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyZUJUPlayerReadyStateEvent, position)
+    else
+        CS.BubblePrompt.Show(data.GetString("CS_JH_Ready_Error_" .. resultType), "GameUI1")
     end
 end
 

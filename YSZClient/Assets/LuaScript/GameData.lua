@@ -77,6 +77,8 @@ GameData =
         Position = 0,
         -- 玩家参与游戏状态(0 空位 1 旁观 2参与)
         PlayerState = 0,
+        -- 玩家准备状态(0准备状态默认值 1 准备 2未准备)
+        ReadyState = 0,
         -- 看牌标记(0为看牌 1看牌)
         CheckState = 0,
         -- 弃牌状态(0 未弃牌 1弃牌)
@@ -168,6 +170,8 @@ function GameData.InitCurrentRoomInfo(roomTypeParam)
     else
         GameData.InitZuJuRoomInfo()
     end
+    print('=========================================')
+
 end
 
 -- (百人房间)数据初始化
@@ -290,7 +294,10 @@ function GameData.InitZuJuRoomInfo()
         local playerInfo = lua_NewTable(GameData.ZuJuPlayer)
         playerInfo.Position = i
         playerInfo.Name = '帝濠' .. i
-        playerInfo.PlayerState = Player_State.JoinNO
+        playerInfo.PlayerState = Player_State.None
+        if i == 5 then
+            playerInfo.PlayerState = Player_State.JoinOK
+        end 
         playerInfo.CheckState = 0
         playerInfo.FoldState = 0
         playerInfo.CompareState = 0
@@ -450,9 +457,17 @@ function GameData.GetPokerCardBackSpriteName(pokerCard)
     return "sprite_Poker_Back_01";
 end
 
+-- 设置百人厅房间状态
 function GameData.SetRoomState(roomState)
     GameData.RoomInfo.CurrentRoom.RoomState = roomState
     GameData.RoomInfo.CurrentRoom.CountDown = ROOM_TIME[roomState]
+    CS.EventDispatcher.Instance:TriggerEvent(EventDefine.UpdateRoomState, roomState)
+end
+
+-- 设置组局房间状态
+function GameData.SetZUJURoomState(roomState)
+    GameData.RoomInfo.CurrentRoom.RoomState = roomState
+    GameData.RoomInfo.CurrentRoom.CountDown = ZUJUROOM_TIME[roomState]
     CS.EventDispatcher.Instance:TriggerEvent(EventDefine.UpdateRoomState, roomState)
 end
 
