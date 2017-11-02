@@ -194,7 +194,6 @@ function SetPlayerHeadIcon(positionParam)
     mPlayersUIInfo[positionParam].HeadIcon:ResetSpriteByName(GameData.GetRoleIconSpriteName(GameData.RoleInfo.AccountIcon), false)
 end
 
-
 -- 还原UI默认基础显示状态
 function RestoreUI2Default()
     -- body
@@ -266,6 +265,9 @@ function WindowOpened()
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.UpdateRoomState, RefreshGameByRoomStateSwitchTo)
 
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUPlayerReadyStateEvent, OnNotifyZUJUPlayerReadyStateEvent)
+    CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUAddPlayerEvent, OnNotifyZUJUAddPlayerEvent)
+    CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUDeletePlayerEvent, OnNotifyZUJUDeletePlayerEvent)
+    CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUBettingEvent, OnNotifyZUJUBettingEvent)
 
 end
 
@@ -275,7 +277,9 @@ function WindowClosed()
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.UpdateRoomState, RefreshGameByRoomStateSwitchTo)
 
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUPlayerReadyStateEvent, OnNotifyZUJUPlayerReadyStateEvent)
-    
+    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUAddPlayerEvent, OnNotifyZUJUAddPlayerEvent)
+    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUDeletePlayerEvent, OnNotifyZUJUDeletePlayerEvent)
+    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUBettingEvent, OnNotifyZUJUBettingEvent)
 
 end
 
@@ -534,6 +538,11 @@ function CastChipToBetArea(areaType, chipValue, chipName, isAnimation, fromWorld
 	end
 end
 
+-- 玩家下注通知call
+function OnNotifyZUJUBettingEvent(eventArgs)
+	BetChipToDesk(eventArgs.BetValue, eventArgs.PositionValue)
+end
+
 -- ===============【洗牌发牌】【4】 ZUJURoomState.Deal===============--
 
 function RefreshDealPartOfGameByRoomState(roomStateParam, initParam)
@@ -647,3 +656,18 @@ function RefreshSettlementPartOfGameByRoomState(roomStateParam, initParam)
     -- body
 end
 
+
+
+-- ==============================================================================
+
+-- 添加一个玩家
+function OnNotifyZUJUAddPlayerEvent(positionParam)
+    ResetPlayerInfo2Defaul(positionParam)
+    SetPlayerSitdownState(position)
+    SetPlayerBaseInfo(position)
+end
+
+-- 删除某个玩家
+function OnNotifyZUJUDeletePlayerEvent(positionParam)
+    ResetPlayerInfo2Defaul(positionParam)
+end

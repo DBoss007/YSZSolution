@@ -73,6 +73,8 @@ GameData =
         IconUrl = '',
         -- 当前拥有金币数量
         GoldValue = 0,
+        -- 本局下注金额
+        BetChipValue = 0,
         -- 玩家位置
         Position = 0,
         -- 玩家参与游戏状态(0 空位 1 旁观 2参与)
@@ -89,6 +91,13 @@ GameData =
         CompareResult = 0,
         -- 扑克列表
         PokerList = { },
+
+        -- 是否是本局赢家 
+        IsWinner = false,
+        -- 赢取的金币值
+        WinGoldValue = 0,
+        -- 是否亮牌(结算时刻)
+        IsShowPokerCard = false,
     },
 
     -- 房间的相关信息
@@ -170,8 +179,6 @@ function GameData.InitCurrentRoomInfo(roomTypeParam)
     else
         GameData.InitZuJuRoomInfo()
     end
-    print('=========================================')
-
 end
 
 -- (百人房间)数据初始化
@@ -269,10 +276,24 @@ function GameData.InitZuJuRoomInfo()
         BetAllValue = 0,
         -- 当前对战回合
         RoundTimes = 0,
+        -- 当前下注位置
+        BettingPosition = 0,
+        -- 当前名牌下注
+        MingCardBetMin = 0,
+        -- 当前暗牌下注最小值
+        DarkCardBetMin = 0,
+
         -- 房间对应位置玩家详细数据
         ZUJUPlayers = { },
         -- 当前房间所有下注情况
         AllBetInfo = { },
+        -- =========挑战数据========
+        -- 挑战者: 位置
+        ChallengerPosition = 0,
+        -- 应邀参与者位置
+        ActorPosition = 0,
+        -- 挑战赢家位置
+        ChallengeWinnerPosition = 0,
 
         -- 本局结算信息
         -- 赢家ID
@@ -283,6 +304,9 @@ function GameData.InitZuJuRoomInfo()
         WinGoldValue = 0,
         -- 赢家当前金币值
         WinnerGoldValue = 0,
+        -- 赢家列表 [1] = { Position = 1, WinGoldValue = 100, GoldValue = 120,}
+        WinnerList = {},
+
         -- 亮牌玩家列表  [1] = {Position = 1,PokerCard[1] = {PokerType = 1, PokerNumber = 1,},PokerCard[2] = {PokerType = 1, PokerNumber = 1,},PokerCard[3] = {PokerType = 1, PokerNumber = 1,} }
         -- 直接映射到具体位置玩家扑克列表
 
