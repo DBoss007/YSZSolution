@@ -247,7 +247,7 @@ function GameData.InitZuJuRoomInfo()
     GameData.RoomInfo.CurrentRoom =
     {
         -- 房间ID
-        RoomID = 123,
+        RoomID = 0,
         -- 房主ID
         MasterID = 1,
         -- 房间类型
@@ -265,7 +265,7 @@ function GameData.InitZuJuRoomInfo()
         -- 下注上限
         BetMax = 1,
         -- 房间状态
-        RoomState = ZUJURoomState.Start,
+        RoomState = ZUJURoomState.Wait,
         -- 当前状态CD
         CountDown = 0,
         -- 玩家自己位置
@@ -319,8 +319,8 @@ function GameData.InitZuJuRoomInfo()
         playerInfo.Position = i
         playerInfo.Name = '帝濠' .. i
         playerInfo.PlayerState = Player_State.None
-        if i == 5 then
-            playerInfo.PlayerState = Player_State.JoinOK
+        if i == 5 or i == 1 then
+            --playerInfo.PlayerState = Player_State.JoinOK
         end 
         playerInfo.CheckState = 0
         playerInfo.FoldState = 0
@@ -331,7 +331,7 @@ function GameData.InitZuJuRoomInfo()
         -- 初始化玩家扑克牌
         for card = 1, 3, 1 do
             playerInfo.PokerList[card] = { }
-            local pokerData = { PokerType = 1, PokerNumber = card, Visible = false, }
+            local pokerData = { PokerType = 1, PokerNumber = card+1, Visible = false, }
             playerInfo.PokerList[card] = pokerData
         end
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[i] = playerInfo

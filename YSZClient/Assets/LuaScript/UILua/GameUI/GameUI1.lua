@@ -61,18 +61,45 @@ local mMasterXZInfo =
 
 local CHIP_JOINTS =
 {
-[1] = { JointPoint = nil, RangeX = { Min = - 200, Max = 200 }, RangeY = { Min = - 150, Max = 150 } },
-[2] = { JointPoint = nil, RangeX = { Min = - 140, Max = 140 }, RangeY = { Min = - 70, Max = 70 } },
-[3] = { JointPoint = nil, RangeX = { Min = - 130, Max = 130 }, RangeY = { Min = - 70, Max = 70 } },
-[4] = { JointPoint = nil, RangeX = { Min = - 200, Max = 200 }, RangeY = { Min = - 120, Max = 100 } },
-[5] = { JointPoint = nil, RangeX = { Min = - 200, Max = 200 }, RangeY = { Min = -120, Max = 100 } },
+    [1] = { JointPoint = nil, RangeX = { Min = - 160, Max = 160 }, RangeY = { Min = - 150, Max = 150 } },
+    [2] = { JointPoint = nil, RangeX = { Min = - 160, Max = 160 }, RangeY = { Min = - 150, Max = 150 } },
+    [3] = { JointPoint = nil, RangeX = { Min = - 160, Max = 160 }, RangeY = { Min = - 150, Max = 150 } },
+    [4] = { JointPoint = nil, RangeX = { Min = - 160, Max = 160 }, RangeY = { Min = - 150, Max = 150 } },
+    [5] = { JointPoint = nil, RangeX = { Min = - 160, Max = 160 }, RangeY = { Min = - 150, Max = 150 } },
 }
 
-local mBetChipAllInfo = 
+-- 筹码起始点组件
+local CHIP_START =
 {
-    
+    [1] = nil,
+    [2] = nil,
+    [3] = nil,
+    [4] = nil,
+    [5] = nil,
 }
 
+-- 筹码组件
+local CHIP_RES =
+{
+    [1] = nil,
+    [2] = nil,
+    [3] = nil,
+    [4] = nil,
+    [5] = nil,
+}
+
+-- 扑克牌发牌时挂接点
+local mPokerCardPoints = { }
+
+-- 房间基础信息(ID 下注总额 对战回合 底注下线 底注上线)
+local mRoomInfo =
+{
+    RoomIDText = nil,
+    BetAllValueText = nil,
+    RoundTimesText = nil,
+    BetMinText = nil,
+    BetMaxText = nil,
+}
 
 -- 初始化UI元素
 function InitUIElement()
@@ -98,9 +125,32 @@ function InitUIElement()
     mMasterXZInfo.JZButton3Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton3/Text'):GetComponent('Text')
     mMasterXZInfo.JZButton4Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton4/Text'):GetComponent('Text')
     mMasterXZInfo.CMImageGameObject = this.transform:Find('Canvas/Players/Player5/CMImage').gameObject
-    
+
+    -- 筹码挂接组件
+    local chipsJointRoot = this.transform:Find('Canvas/AllBetChips/ChipPoints')
+    for index = 1, 5, 1 do
+        local rectTrans = chipsJointRoot:Find('HandlePoint' .. index):GetComponent("RectTransform")
+        CHIP_START[index] = rectTrans
+        CHIP_JOINTS[index].JointPoint = this.transform:Find('Canvas/AllBetChips/ChipJoints/HandleJoint_' .. index):GetComponent("RectTransform")
+        CHIP_RES[index] = this.transform:Find('Canvas/AllBetChips/ChipRes/ChipItem_' .. index)
+    end
+
+    -- 扑克牌挂接点
+    for index = 1, 15, 1 do
+        mPokerCardPoints[index] = nil
+        mPokerCardPoints[index] = this.transform:Find('Canvas/Players/PokerCardPoints/CardPoint_' .. index)
+    end
+
+    -- 房间信息
+    mRoomInfo.RoomIDText = this.transform:Find('Canvas/RoomInfo/RoomID/Text'):GetComponent('Text')
+    mRoomInfo.BetAllValueText = this.transform:Find('Canvas/RoomInfo/BetAllValue/Text'):GetComponent('Text')
+    mRoomInfo.RoundTimesText = this.transform:Find('Canvas/RoomInfo/RoundTimes/Text'):GetComponent('Text')
+    mRoomInfo.BetMinText = this.transform:Find('Canvas/RoomInfo/BetMin/Text'):GetComponent('Text')
+    mRoomInfo.BetMaxText = this.transform:Find('Canvas/RoomInfo/BetMax/Text'):GetComponent('Text')
 
 end
+
+
 
 function InitPlayerUIElement()
     -- body
@@ -177,6 +227,7 @@ function SetPlayerBaseInfo(positionParam)
         SetPlayerHeadIcon(positionParam)
         SetPlayerGoldValue(positionParam)
     end
+    print(string.format('玩家:%d 状态:%d', positionParam, PlayerState))
 end
 
 -- 设置指定玩家金币值
@@ -311,9 +362,42 @@ function AddButtonHandlers()
     this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton2'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(2) end)
     this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton3'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(3) end)
     this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton4'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(4) end)
+    -- 每个位置要求按钮call
+    for position = 1, 5, 1 do
+        local childItem = this.transform:Find('Canvas/Players/Player' .. position .. '/Head/YQButton'):GetComponent('Button').onClick:AddListener( function() OnYQButtonClick(position) end)
+    end
 
-    
+end
 
+--=============================房间基础信息设置==========================================
+-- 设置房间基础信息
+function SetRoomBaseInfo()
+    local roomData = GameData.RoomInfo.CurrentRoom
+    SetRoomID(roomData.RoomID)
+    SetBetAllValueText(roomData.BetAllValue)
+    SetRounTimesText(roomData.RoundTimes)
+    SetBetMinText(roomData.BetMin)
+    SetBetMaxText(roomData.BetMax)
+end
+
+function SetRoomID(roomIDParam)
+    mRoomInfo.RoomIDText.text = tostring(roomIDParam)
+end
+
+function SetBetAllValueText(betParam)
+    mRoomInfo.BetAllValueText.text = tostring(betParam)
+end
+
+function SetRounTimesText(roundTimesParam)
+    mRoomInfo.RoundTimesText.text = string.format('%d/%d', roundTimesParam, 20)
+end
+
+function SetBetMinText(betMinParam)
+    mRoomInfo.BetMinText.text = tostring(betMinParam)
+end
+
+function SetBetMaxText(betMaxParam)
+    mRoomInfo.BetMaxText.text = tostring(betMaxParam)
 end
 
 ---------------------------------------------------------------------------------
@@ -352,6 +436,32 @@ function OnSitUpButtonClick()
     -- body
     print("站起按钮点击")
     SetCaidanShow(false)
+
+    -- TODO 测试 通知挑战者下注
+    GameData.SetZUJURoomState(ZUJURoomState.Deal)
+end
+
+-- 邀请按钮call
+function OnYQButtonClick(positionParam)
+    if positionParam == 1 then
+
+    elseif positionParam == 2 then
+
+    elseif positionParam == 3 then
+
+    elseif positionParam == 4 then
+
+    else
+
+    end
+
+    print('-----positionParam:' .. positionParam)
+
+    local ChallengeWinnerPosition = positionParam
+    local ChallengerBetValue = 100
+    local betChipEventArg = { PositionValue = ChallengeWinnerPosition, BetValue = ChallengerBetValue }
+    CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyZUJUBettingEvent, betChipEventArg)
+
 end
 
 -------------------------------按钮 call end--------------------------------------------------
@@ -360,7 +470,7 @@ function ResetGameToRoomState(currentState)
     canPlaySoundEffect = false
     -- 停止掉所有的协程
     this:StopAllDelayInvoke()
-    -- InitRoomBaseInfos()
+    InitRoomBaseInfos()
     RefreshGameRoomToEnterGameState(currentState, true)
     canPlaySoundEffect = true
 end
@@ -393,6 +503,7 @@ function InitRoomBaseInfos(roomStateParam)
         SetPlayerSitdownState(position)
         SetPlayerBaseInfo(position)
     end
+    SetRoomBaseInfo()
 end
 
 -- 游戏状态变化音效播放接口
@@ -430,6 +541,8 @@ function RefreshWaitPartOfGameByRoomState(roomStateParam, initParam)
             end
         end
         RefreshZBButtonShow()
+
+        SetRoomBaseInfo()
     else
         -- 准备状态还原
         for position = 1, 5, 1 do
@@ -456,14 +569,12 @@ end
 
 -- 刷新准备按钮显示
 function RefreshZBButtonShow()
-    local selfState  = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].PlayerState
+    local selfState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].PlayerState
     if selfState ~= Player_State.JoinOK then
-        SetZBButtonShow(false)
+        SetZBButtonShow(true)
     else
-        local PlayerState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState
-        mPlayersUIInfo[position].ZBImage.gameObject:SetActive(false)
+        SetZBButtonShow(false)
     end
-
 end
 
 -- 通知玩家准备状态
@@ -501,14 +612,9 @@ end
 -- 押注筹码到桌子上
 function BetChipToDesk(betValueParam, positionParam)
     local startPoint = nil
-    if roleID == GameData.RoleInfo.AccountID then
-        -- 如果是自己，则从自己点开始， 否则从其他玩家点开始
-        startPoint = CHIP_JOINTS[11]
-    else
-        startPoint = CHIP_JOINTS[12]
-    end
+    startPoint = CHIP_START[positionParam]
 
-    CastChipToBetArea(areaType, betValue, tostring(roleID), true, startPoint.JointPoint.position)
+    CastChipToBetArea(positionParam, betValue, tostring(positionParam), true, startPoint.position)
 
     -- 押注筹码音效
     PlaySoundEffect(5)
@@ -516,37 +622,119 @@ end
 
 -- 向押注区域投掷筹码
 function CastChipToBetArea(areaType, chipValue, chipName, isAnimation, fromWorldPoint)
-	local model = CHIP_MODEL[chipValue]
-	if model ~= nil then
-		local betChip = CS.UnityEngine.Object.Instantiate(model)
-		betChip.gameObject.name = chipName
-		local areaInfo = CHIP_JOINTS[areaType]
-		CS.Utility.ReSetTransform(betChip, areaInfo.JointPoint)
-		local toLocalPoint = lua_RandomXYOfVector3(areaInfo.RangeX.Min, areaInfo.RangeX.Max, areaInfo.RangeY.Min, areaInfo.RangeY.Max)
-		betChip.gameObject:SetActive(true)
-		if isAnimation then
-			betChip.position = fromWorldPoint
-			local script = betChip:GetComponent("TweenPosition")
-			script.from = betChip.localPosition
-			script.to = toLocalPoint
-			script.worldSpace = false
-			script:ResetToBeginning()
-			script:Play(true)
-		else
-			betChip.localPosition = toLocalPoint
-		end
-	end
+    local model = CHIP_RES[areaType]
+    if model ~= nil then
+        local betChip = CS.UnityEngine.Object.Instantiate(model)
+        betChip.gameObject.name = chipName
+        betChip:Find('Text'):GetComponent('Text').text = tostring(chipValue)
+        local areaInfo = CHIP_JOINTS[areaType]
+        CS.Utility.ReSetTransform(betChip, areaInfo.JointPoint)
+        local toLocalPoint = lua_RandomXYOfVector3(areaInfo.RangeX.Min, areaInfo.RangeX.Max, areaInfo.RangeY.Min, areaInfo.RangeY.Max)
+        betChip.gameObject:SetActive(true)
+        if isAnimation then
+            betChip.position = fromWorldPoint
+            local script = betChip:GetComponent("TweenPosition")
+            script.from = betChip.localPosition
+            script.to = toLocalPoint
+            script.worldSpace = false
+            script:ResetToBeginning()
+            script:Play(true)
+        else
+            betChip.localPosition = toLocalPoint
+        end
+    end
 end
 
 -- 玩家下注通知call
 function OnNotifyZUJUBettingEvent(eventArgs)
-	BetChipToDesk(eventArgs.BetValue, eventArgs.PositionValue)
+    BetChipToDesk(eventArgs.BetValue, eventArgs.PositionValue)
 end
 
 -- ===============【洗牌发牌】【4】 ZUJURoomState.Deal===============--
 
 function RefreshDealPartOfGameByRoomState(roomStateParam, initParam)
     -- body
+    if roomStateParam == ZUJURoomState.Deal then
+
+        PlayDealAnimation()
+    else
+
+    end
+end
+
+-- 发牌动画
+function PlayDealAnimation()
+    -- 可以播放发牌动画的玩家
+    local ZUJUPlayers = GameData.RoomInfo.CurrentRoom.ZUJUPlayers
+    local tResetPosition = { }
+    for index = 5, 1, -1 do
+        if Player_State.JoinOK == ZUJUPlayers[index].PlayerState then
+            table.insert(tResetPosition, index)
+        end
+    end
+
+    -- 顺序3张牌排列
+    local cardIndex = 15
+    for pos = 1, 3, 1 do
+        for k1, v1 in pairs(tResetPosition) do
+            -- 位置重置中心
+            CS.Utility.ReSetTransform(mPlayersUIInfo[v1].PokerCards[pos], mPokerCardPoints[cardIndex])
+            cardIndex = cardIndex - 1
+        end
+    end
+
+    -- 发牌顺序位置
+    local tcanPlayAnimationPosition = { }
+    for index = 1, 5, 1 do
+        if Player_State.JoinOK == ZUJUPlayers[index].PlayerState then
+            table.insert(tcanPlayAnimationPosition, index)
+        end
+    end
+    -- 按序发牌
+    local delayTime = 0
+    local cardPointIndex = 15
+    for pokerIndex = 1, 3, 1 do
+
+        for k1, v1 in pairs(tcanPlayAnimationPosition) do
+            -- print(string.format('发牌序列:%d_%d', v1, pokerIndex))
+            SetPokerCardShow(v1, pokerIndex, true)
+            SetTablePokerCardVisible(mPlayersUIInfo[v1].PokerCards[pokerIndex], false)
+
+            delayTime = delayTime + 0.1
+            this:DelayInvoke(delayTime,
+            function()
+                local cardItem = mPlayersUIInfo[v1].PokerCards[pokerIndex]
+                lua_Clear_AllUITweener(cardItem)
+
+                if cardItem.gameObject.activeSelf == false then
+                    cardItem.gameObject:SetActive(true)
+                end
+
+                local pokerCard = ZUJUPlayers[v1].PokerList[pokerIndex]
+                local script = cardItem.gameObject:AddComponent(typeof(CS.TweenTransform))
+                script.from = mPokerCardPoints[cardPointIndex]
+                script.to = mPlayersUIInfo[v1].PokerPoints[pokerIndex]
+                script.duration = 0.4
+                script:OnFinished("+",
+                ( function()
+                    CS.UnityEngine.Object.Destroy(script)
+                    if pokerCard.PokerNumber > 0 then
+                        cardItem:GetComponent("Image"):ResetSpriteByName(GameData.GetPokerCardSpriteName(pokerCard))
+                    end
+                    SetTablePokerCardVisible(cardItem, pokerCard.Visible)
+                    CS.Utility.ReSetTransform(cardItem, mPlayersUIInfo[v1].PokerPoints[pokerIndex])
+                    -- lua_Paste_Transform_Value(cardItem, script.to)
+                end ))
+                script:Play(true)
+                -- 音效发牌音效
+                PlaySoundEffect(20122)
+            end )
+
+            cardPointIndex = cardPointIndex - 1
+
+        end
+
+    end
 end
 
 -- ===============【下注阶段】【5】 ZUJURoomState.Betting===============--
