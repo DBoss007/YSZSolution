@@ -964,7 +964,7 @@ end
 function OnNotifyZUJUAddPlayerEvent(positionParam)
     ResetPlayerInfo2Defaul(positionParam)
     SetPlayerSitdownState(positionParam)
-    SetPlayerBaseInfo(position)
+    SetPlayerBaseInfo(positionParam)
 end
 
 -- 删除某个玩家
