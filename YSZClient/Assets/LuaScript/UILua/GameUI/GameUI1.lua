@@ -224,6 +224,7 @@ end
 
 -- 设置对应位置坐下状态
 function SetPlayerSitdownState(positionParam)
+    print('玩家位置:' .. positionParam)
     local PlayerState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam].PlayerState
     mPlayersUIInfo[positionParam].YQButton.gameObject:SetActive(PlayerState == Player_State.None)
 
@@ -962,7 +963,7 @@ end
 -- 添加一个玩家
 function OnNotifyZUJUAddPlayerEvent(positionParam)
     ResetPlayerInfo2Defaul(positionParam)
-    SetPlayerSitdownState(position)
+    SetPlayerSitdownState(positionParam)
     SetPlayerBaseInfo(position)
 end
 

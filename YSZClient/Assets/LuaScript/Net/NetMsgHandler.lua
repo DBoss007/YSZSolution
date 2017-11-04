@@ -493,7 +493,8 @@ end
 -- 请求登录游戏服务器
 function NetMsgHandler.Send_CS_Login()
     local message = CS.Net.PushMessage()
-    message:PushString(GameData.LoginInfo.Account)
+   -- message:PushString(GameData.LoginInfo.Account)
+    message:PushString('AccountA')
     message:PushUInt16(GameData.LoginInfo.PlatformType)
     message:PushString(GameData.LoginInfo.AccountName)
     message:PushUInt16(GameData.ChannelCode)
@@ -2622,16 +2623,15 @@ function NetMsgHandler.Received_S_JH_Add_Player(message)
     -- body
     local position = message:PopByte()
     position = GameData.PlayerPositionConvert2ShowPosition(position)
-    local Name = message:PopString()
 
-    -- local playerID = message:PopUInt32()
+    local playerID = message:PopUInt32()
     local Name = message:PopString()
     local HeadIcon = message:PopByte()
     local HeadUrl = message:PopString()
     local GoldValue = message:PopInt64()
     local PlayerState = message:PopByte()
 
-    -- GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
+    GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].AccountID = playerID
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Name = Name
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].HeadIcon = HeadIcon
