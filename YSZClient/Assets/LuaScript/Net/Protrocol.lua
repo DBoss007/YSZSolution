@@ -3,10 +3,11 @@ ProtrocolID =
     CS_SEND_CODE_TO_HUB                      = 110,-- 给服务器发送验证code
     CS_SEND_CREATE_ORDER_TO_HUB              = 111,-- 给服务器发送创建订单协议
     
-    --gameserver服务器协议
+    
     S_SFT_PAY_RESULT                         = 113,-- 服务器通知盛付通支付结果
     CS_Visitor_Check                         = 198,-- 游客登录开关验证
     CS_Request_Game_Server                   = 199,-- 请求登陆服务器
+    --gameserver服务器协议
     CS_Login                                 = 200,-- 登陆    
     S_Disconnect                             = 201,-- 断开连接    
     S_Update_Diamond                         = 203,-- 更新钻石数量    

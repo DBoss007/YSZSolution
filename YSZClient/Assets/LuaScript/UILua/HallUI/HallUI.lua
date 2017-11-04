@@ -10,7 +10,7 @@ local IsUpDate = true
 
 function Awake()
     -- 玩家信息响应
-    this.transform:Find('Canvas/RoleInfo/Gold/Icon'):GetComponent("Button").onClick:AddListener(AddGoldButtonOnClick)
+    this.transform:Find('Canvas/RoleInfo/Gold'):GetComponent("Button").onClick:AddListener(AddGoldButtonOnClick)
     this.transform:Find('Canvas/RoleInfo/RoomCard/Icon'):GetComponent("Button").onClick:AddListener(AddRoomCardButtonOnClick)
     this.transform:Find('Canvas/RoleInfo/Diamond/Icon'):GetComponent("Button").onClick:AddListener(AddDiamondButton_OnClick)
     this.transform:Find('Canvas/RoleInfo/RoleIcon'):GetComponent("Button").onClick:AddListener(HallUI_HeadIconOnClick)

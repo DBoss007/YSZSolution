@@ -92,7 +92,7 @@ GameData =
         -- 扑克列表
         PokerList = { },
 
-        -- 是否是本局赢家 
+        -- 是否是本局赢家
         IsWinner = false,
         -- 赢取的金币值
         WinGoldValue = 0,
@@ -305,7 +305,7 @@ function GameData.InitZuJuRoomInfo()
         -- 赢家当前金币值
         WinnerGoldValue = 0,
         -- 赢家列表 [1] = { Position = 1, WinGoldValue = 100, GoldValue = 120,}
-        WinnerList = {},
+        WinnerList = { },
 
         -- 亮牌玩家列表  [1] = {Position = 1,PokerCard[1] = {PokerType = 1, PokerNumber = 1,},PokerCard[2] = {PokerType = 1, PokerNumber = 1,},PokerCard[3] = {PokerType = 1, PokerNumber = 1,} }
         -- 直接映射到具体位置玩家扑克列表
@@ -316,12 +316,13 @@ function GameData.InitZuJuRoomInfo()
     for i = 1, 5, 1 do
         -- 初始化玩家基础信息
         local playerInfo = lua_NewTable(GameData.ZuJuPlayer)
+        playerInfo.AccountID = 0
         playerInfo.Position = i
         playerInfo.Name = '帝濠' .. i
         playerInfo.PlayerState = Player_State.None
         if i == 5 or i == 1 then
-            --playerInfo.PlayerState = Player_State.JoinOK
-        end 
+             --playerInfo.PlayerState = Player_State.JoinOK
+        end
         playerInfo.CheckState = 0
         playerInfo.FoldState = 0
         playerInfo.CompareState = 0
@@ -331,7 +332,7 @@ function GameData.InitZuJuRoomInfo()
         -- 初始化玩家扑克牌
         for card = 1, 3, 1 do
             playerInfo.PokerList[card] = { }
-            local pokerData = { PokerType = 1, PokerNumber = card+1, Visible = false, }
+            local pokerData = { PokerType = 1, PokerNumber = card + 1, Visible = false, }
             playerInfo.PokerList[card] = pokerData
         end
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[i] = playerInfo
@@ -343,6 +344,7 @@ end
 function GameData.PlayerPositionConvert2ShowPosition(tagPositionParam)
     if tagPositionParam > 0 then
         local position =(5 - GameData.RoomInfo.CurrentRoom.SelfPosition + tagPositionParam - 1) % 5 + 1
+        print("转换后位置:" .. position)
         return position
     else
         print("服务器传入位置有误:" .. tagPositionParam)
@@ -386,7 +388,7 @@ function GameData.SubFloatZeroPart(valueStr)
 end
 
 function GameData.Init()
-    GameData.InitCurrentRoomInfo(ROOM_TYPE.JH_JuLong)
+    GameData.InitCurrentRoomInfo(ROOM_TYPE.JH_ZuJu)
     GameData.InitHallData()
 end
 

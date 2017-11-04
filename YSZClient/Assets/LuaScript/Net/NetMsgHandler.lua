@@ -422,13 +422,7 @@ function NetMsgHandler.ConnectAndSendLogin()
         if success then
             IsProactiveDisconnect = false
             LoginMgr.isChangeAccount = 0
-            local message = CS.Net.PushMessage()
-            message:PushString(GameData.LoginInfo.Account)
-            message:PushUInt16(GameData.LoginInfo.PlatformType)
-            message:PushString(GameData.LoginInfo.AccountName)
-            message:PushUInt16(GameData.ChannelCode)
-            NetMsgHandler.SendMessageToGame(ProtrocolID.CS_Login, message, true);
-            print('链接服务器 渠道ID:' .. GameData.ChannelCode)
+            NetMsgHandler.Send_CS_Login()
         else
             -- 连接失败，显示日志信息
             -- print('连接服务器失败')
@@ -494,6 +488,17 @@ end
 function ConnectTimeOut()
     -- print('Connect server time out');
     CS.EventDispatcher.Instance:TriggerEvent(EventDefine.ConnectGameServerTimeOut, 1)
+end
+
+-- 请求登录游戏服务器
+function NetMsgHandler.Send_CS_Login()
+    local message = CS.Net.PushMessage()
+    message:PushString(GameData.LoginInfo.Account)
+    message:PushUInt16(GameData.LoginInfo.PlatformType)
+    message:PushString(GameData.LoginInfo.AccountName)
+    message:PushUInt16(GameData.ChannelCode)
+    NetMsgHandler.SendMessageToGame(ProtrocolID.CS_Login, message, true);
+    print('链接服务器 渠道ID:' .. GameData.ChannelCode)
 end
 
 -- 处理收到服务器 登陆结果 消息
@@ -2241,13 +2246,14 @@ function NetMsgHandler.Send_CS_JH_Create_Room(betMinParam, betMaxParam, isLockPa
     message:PushUInt32(enterBetParam)
     message:PushUInt32(quitBetParam)
 
-    NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Create_Room, message, false)
+    NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Create_Room, message, true)
     print(string.format("-----Account:%d Min:%d Max:%d Lock:%d RoomType:%d MenJi:%d EnterBet:%d QuitBet:%d", GameData.RoleInfo.AccountID, betMinParam, betMaxParam, isLockParam, roomTypeParam, menTimesParam, enterBetParam, quitBetParam))
 end
 
 -- 组局厅请求创建房间反馈
 function NetMsgHandler.Received_CS_JH_Create_Room(message)
     -- body
+    CS.LoadingDataUI.Hide()
     local resultType = message:PopByte()
     if resultType == 0 then
 
@@ -2276,16 +2282,12 @@ end
 
 -- 组局厅请求进入组局房间
 function NetMsgHandler.Received_CS_JH_Enter_Room1(message)
+    CS.LoadingDataUI.Hide()
     -- body
     local resultType = message:PopByte()
     if resultType == 0 then
         -- 进入游戏房间
-        local openparam = CS.WindowNodeInitParam("GameUI1")
-        openparam.NodeType = 0
-        openparam.LoadComplatedCallBack = function(windowNode)
-            CS.WindowManager.Instance:CloseWindow("HallUI", false)
-        end
-        CS.WindowManager.Instance:OpenWindow(openparam)
+        NetMsgHandler.OpenZUJUGameUI()
     else
         CS.BubblePrompt.Show(data.GetString("JH_Enter_Room1_Error_" .. resultType), "HallUI")
     end
@@ -2306,17 +2308,32 @@ function NetMsgHandler.Send_CS_JH_Enter_Room2(roomTypeParam)
 
 end
 
-
 -- 组局厅请求进入闷鸡房间2
 function NetMsgHandler.Received_CS_JH_Enter_Room2(message)
+    CS.LoadingDataUI.Hide()
     -- body
     local resultType = message:PopByte()
     if resultType == 0 then
-
+        NetMsgHandler.OpenZUJUGameUI()
     else
         CS.BubblePrompt.Show(data.GetString("JH_Enter_Room2_Error_" .. resultType), "HallUI")
     end
     print("-----803 ID:" .. resultType)
+end
+
+-- 进入对战游戏房间
+function NetMsgHandler.OpenZUJUGameUI()
+    local gameui1Node = CS.WindowManager.Instance:FindWindowNodeByName('GameUI1')
+    if gameui1Node == nil then
+        local openparam = CS.WindowNodeInitParam("GameUI1")
+        openparam.NodeType = 0
+        openparam.LoadComplatedCallBack = function(windowNode)
+            CS.WindowManager.Instance:CloseWindow("HallUI", false)
+        end
+        CS.WindowManager.Instance:OpenWindow(openparam)
+    else
+        -- TODO  已经处于对战房间
+    end
 end
 
 -- ============================================================================--
@@ -2328,14 +2345,10 @@ function NetMsgHandler.Received_S_JH_Set_Game_Data(message)
     NetMsgHandler.ParseJHRoomBaseInfo(message)
     NetMsgHandler.ParseJHRoomPlayersInfo(message)
     NetMsgHandler.ParseAllBetInfo(message)
-    NetMsgHandler.ParseGameResultInfo(message)
-
+    NetMsgHandler.ParseZUJURoomStateSwitchToSettlement(message)
     CS.EventDispatcher.Instance:TriggerEvent(EventDefine.InitRoomState, GameData.RoomInfo.CurrentRoom.RoomState)
-
-
     -- 切换状态为房间
     GameData.GameState = GAME_STATE.ROOM
-
 end
 
 -- 解析房间基础信息
@@ -2355,6 +2368,8 @@ function NetMsgHandler.ParseJHRoomBaseInfo(message)
     local BankerPosition = message:PopByte()
     GameData.RoomInfo.CurrentRoom.BetAllValue = message:PopInt64()
     GameData.RoomInfo.CurrentRoom.RoundTimes = message:PopByte()
+    print('玩家真实位置:' .. GameData.RoomInfo.CurrentRoom.SelfPosition)
+    print(string.format('底注min:%d 底注max:%d', GameData.RoomInfo.CurrentRoom.BetMin, GameData.RoomInfo.CurrentRoom.BetMax))
     -- 位置转换
     GameData.RoomInfo.CurrentRoom.BankerPosition = GameData.PlayerPositionConvert2ShowPosition(BankerPosition)
 end
@@ -2376,9 +2391,15 @@ function NetMsgHandler.ParseJHRoomPlayersInfo(message)
         local FoldState = message:PopByte()
         local CompareState = message:PopByte()
         local CompareResult = message:PopByte()
-
+        print(string.format('玩家基础信息ID:%d Name:%s Head:%d Url:%s Gold:%d Pos:%d 状态:%d', playerID, Name, HeadIcon, HeadUrl, GoldValue, severposition, PlayerState))
+        print('玩家服务器位置:' .. severposition)
+        if severposition == 0 then
+            error('服务器上传玩家位置:0 有误!!!')
+        end
+        
         local position = GameData.PlayerPositionConvert2ShowPosition(severposition)
         GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
+
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].AccountID = playerID
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Name = Name
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].HeadIcon = HeadIcon
@@ -2391,6 +2412,7 @@ function NetMsgHandler.ParseJHRoomPlayersInfo(message)
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CompareResult = CompareResult
         -- 扑克牌解析
         local cardCount = message:PopUInt16()
+        print('当前扑克数量:'..cardCount)
         for cardIndex = 1, cardCount, 1 do
             PokerType = message:PopByte()
             PokerNumber = message:PopByte()
@@ -2413,44 +2435,6 @@ function NetMsgHandler.ParseAllBetInfo(message)
         local BetInfo = { Position = position, BetValue = betValue }
         GameData.RoomInfo.CurrentRoom.AllBetInfo[index] = BetInfo
     end
-end
-
--- 解析当前结算信息
-function NetMsgHandler.ParseGameResultInfo(message)
-    
-    return
-    --[[
-    -- body
-    -- 赢家ID
-    local WinnerID = message:PopUInt32()
-    local WinnerPosition = message:PopByte()
-    local WinGoldValue = message:PopInt64()
-    local WinnerGoldValue = message:PopInt64()
-    WinnerPosition = GameData.PlayerPositionConvert2ShowPosition(WinnerPosition)
-    WinGoldValue = GameConfig.GetFormatColdNumber(WinGoldValue)
-    WinnerGoldValue = GameConfig.GetFormatColdNumber(WinnerGoldValue)
-
-    GameData.RoomInfo.CurrentRoom.WinnerID = WinnerID
-    GameData.RoomInfo.CurrentRoom.WinnerPosition = WinnerPosition
-    GameData.RoomInfo.CurrentRoom.WinGoldValue = WinGoldValue
-    GameData.RoomInfo.CurrentRoom.WinnerGoldValue = WinnerGoldValue
-    if WinnerPosition ~= 0 then
-        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[WinnerPosition].GoldValue = WinnerGoldValue
-    end
-
-    local showCount = message:PopUInt16()
-    print('量牌玩家数量:' .. showCount)
-    for i = 1, showCount, 1 do
-        local showPosition = message:PopByte()
-        showPosition = GameData.PlayerPositionConvert2ShowPosition(showPosition)
-        local cardCount = message:PopUInt16()
-        for cardIndex = 1, cardCount, 1 do
-            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[showPosition].PokerList[cardIndex].PokerType = message:PopByte()
-            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[showPosition].PokerList[cardIndex].PokerNumber = message:PopByte()
-            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[showPosition].PokerList[cardIndex].Visible = true
-        end
-    end
-    ]]
 end
 
 -- ============================================================================--
@@ -2640,14 +2624,14 @@ function NetMsgHandler.Received_S_JH_Add_Player(message)
     position = GameData.PlayerPositionConvert2ShowPosition(position)
     local Name = message:PopString()
 
-    local playerID = message:PopUInt32()
+    -- local playerID = message:PopUInt32()
     local Name = message:PopString()
     local HeadIcon = message:PopByte()
     local HeadUrl = message:PopString()
     local GoldValue = message:PopInt64()
     local PlayerState = message:PopByte()
 
-    GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
+    -- GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].AccountID = playerID
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Name = Name
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].HeadIcon = HeadIcon
@@ -2697,14 +2681,15 @@ function NetMsgHandler.Send_CS_JH_Exit_Room(rooIDParam)
     message:PushUInt32(GameData.RoleInfo.AccountID)
     message:PushUInt32(rooIDParam)
     NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Exit_Room, message, true)
-    print("-----CS_JH_Exit_Room ID:" .. roomTypeParam)
+    print("-----808 ID:" .. rooIDParam)
 end
 
 -- 组局厅请求离开房间反馈
 function NetMsgHandler.Received_CS_JH_Exit_Room(message)
+    CS.LoadingDataUI.Hide()
     local resultType = message:PopByte()
     if resultType == 0 then
-        
+
     else
         CS.BubblePrompt.Show(data.GetString("CS_JH_Exit_Room_Error_" .. resultType), "GameUI1")
     end

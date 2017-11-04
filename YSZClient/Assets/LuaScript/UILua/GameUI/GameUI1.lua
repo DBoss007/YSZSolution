@@ -47,6 +47,11 @@ local mMasterXZInfo =
     KPButtonGameObject = nil,
     -- 下注模块组件
     XZButtonGameObject = nil,
+    QPButtonGameObject = nil,
+    JZButtonGameObject1 = nil,
+    GZButtonGameObject = nil,
+    BPButtonGameObject = nil,
+
     -- 加注模块组件
     JZButtonGameObject = nil,
     JZButton1Text = nil,
@@ -101,6 +106,11 @@ local mRoomInfo =
     BetMaxText = nil,
 }
 
+-- 当前下注者CD信息
+local mCurrentHandleCD = nil
+local mISUpdateBetingCD = false
+
+
 -- 初始化UI元素
 function InitUIElement()
     -- body
@@ -117,9 +127,14 @@ function InitUIElement()
     -- 玩家下注模块
     this.transform:Find('Canvas/MasterInfo').gameObject:SetActive(true)
     mMasterXZInfo.KPButtonGameObject = this.transform:Find('Canvas/MasterInfo/KPButton').gameObject
-    mMasterXZInfo.XZButtonGameObject = this.transform:Find('Canvas/MasterInfo/Buttons').gameObject
+    mMasterXZInfo.XZButtonGameObject = this.transform:Find('Canvas/MasterInfo/Buttons/').gameObject
+    mMasterXZInfo.QPButtonGameObject = this.transform:Find('Canvas/MasterInfo/Buttons/QPButton').gameObject
+    mMasterXZInfo.JZButtonGameObject1 = this.transform:Find('Canvas/MasterInfo/Buttons/JZButton').gameObject
+    mMasterXZInfo.GZButtonGameObject = this.transform:Find('Canvas/MasterInfo/Buttons/GZButton').gameObject
+    mMasterXZInfo.BPButtonGameObject = this.transform:Find('Canvas/MasterInfo/Buttons/BPButton').gameObject
+
     mMasterXZInfo.JZButtonGameObject = this.transform:Find('Canvas/MasterInfo/JZInfo').gameObject
-    mMasterXZInfo.ZBButtonGameObject = this.transform:Find('Canvas/MasterInfo/Buttons/ZBButton').gameObject
+    mMasterXZInfo.ZBButtonGameObject = this.transform:Find('Canvas/MasterInfo/ZBButton').gameObject
     mMasterXZInfo.JZButton1Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton1/Text'):GetComponent('Text')
     mMasterXZInfo.JZButton2Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton2/Text'):GetComponent('Text')
     mMasterXZInfo.JZButton3Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton3/Text'):GetComponent('Text')
@@ -149,8 +164,6 @@ function InitUIElement()
     mRoomInfo.BetMaxText = this.transform:Find('Canvas/RoomInfo/BetMax/Text'):GetComponent('Text')
 
 end
-
-
 
 function InitPlayerUIElement()
     -- body
@@ -259,8 +272,6 @@ function RestoreUI2Default()
     for position = 1, 5, 1 do
         ResetPlayerInfo2Defaul(position)
     end
-    -- 设置玩家座位基础信息
-
 end
 
 -- 重置扑克牌显示
@@ -301,13 +312,16 @@ function Awake()
     InitUIElement()
     AddButtonHandlers()
     RestoreUI2Default()
-end
-
-function Start()
     -- body
     if GameData.RoomInfo.CurrentRoom.RoomID > 0 then
         ResetGameToRoomState(GameData.RoomInfo.CurrentRoom.RoomState)
     end
+    -- TODO 测试模块
+    Test1()
+end
+
+function Start()
+
 end
 
 -- UI 开启
@@ -336,7 +350,8 @@ end
 
 -- 每一帧更新
 function Update()
-
+    GameData.ReduceRoomCountDownValue(Time.deltaTime)
+    UpdateCurrentBettingCD()
 end
 
 function OnDestroy()
@@ -346,7 +361,7 @@ end
 -- 按钮事件响应绑定
 function AddButtonHandlers()
     this.transform:Find('Canvas/CaidanButton'):GetComponent("Button").onClick:AddListener(OnCaidanButtonClick)
-    this.transform:Find('Canvas/CaidanButton/ReturnCaiDan/ReturnButton'):GetComponent("Button").onClick:AddListener(OnReturnButtonClick)
+    this.transform:Find('Canvas/CaidanButton/ReturnCaiDan/ReturnButton'):GetComponent("Button").onClick:AddListener(OnQuitGameButtonClick)
     this.transform:Find('Canvas/CaidanButton/ReturnCaiDan/SitUpButton'):GetComponent("Button").onClick:AddListener(OnSitUpButtonClick)
     this.transform:Find('Canvas/CaidanButton/ReturnCaiDan/Image'):GetComponent("Button").onClick:AddListener(OnCaidanHideClick)
 
@@ -355,7 +370,7 @@ function AddButtonHandlers()
     this.transform:Find('Canvas/MasterInfo/Buttons/JZButton'):GetComponent('Button').onClick:AddListener(OnJZButtonClick)
     this.transform:Find('Canvas/MasterInfo/Buttons/GZButton'):GetComponent('Button').onClick:AddListener(OnGZButtonClick)
     this.transform:Find('Canvas/MasterInfo/Buttons/BPButton'):GetComponent('Button').onClick:AddListener(OnBPButtonClick)
-    this.transform:Find('Canvas/MasterInfo/Buttons/ZBButton'):GetComponent('Button').onClick:AddListener(OnZBButtonClick)
+    this.transform:Find('Canvas/MasterInfo/ZBButton'):GetComponent('Button').onClick:AddListener(OnZBButtonClick)
 
     this.transform:Find('Canvas/MasterInfo/JZInfo'):GetComponent('Button').onClick:AddListener(OnJZHideClick)
     this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton1'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(1) end)
@@ -369,7 +384,7 @@ function AddButtonHandlers()
 
 end
 
---=============================房间基础信息设置==========================================
+-- =============================房间基础信息设置==========================================
 -- 设置房间基础信息
 function SetRoomBaseInfo()
     local roomData = GameData.RoomInfo.CurrentRoom
@@ -424,11 +439,10 @@ function SetCaidanShow(showParam)
 end
 
 -- 推出游戏按钮 call
-function OnReturnButtonClick()
+function OnQuitGameButtonClick()
     -- body
-    print("推出按钮点击")
     SetCaidanShow(false)
-    CS.WindowManager.Instance:CloseWindow('GameUI1', false)
+    NetMsgHandler.Send_CS_JH_Exit_Room(GameData.RoomInfo.CurrentRoom.RoomID)
 end
 
 -- 站起按钮 call
@@ -437,8 +451,7 @@ function OnSitUpButtonClick()
     print("站起按钮点击")
     SetCaidanShow(false)
 
-    -- TODO 测试 通知挑战者下注
-    GameData.SetZUJURoomState(ZUJURoomState.Deal)
+
 end
 
 -- 邀请按钮call
@@ -456,7 +469,7 @@ function OnYQButtonClick(positionParam)
     end
 
     print('-----positionParam:' .. positionParam)
-
+    -- TODO 测试 模拟下注
     local ChallengeWinnerPosition = positionParam
     local ChallengerBetValue = 100
     local betChipEventArg = { PositionValue = ChallengeWinnerPosition, BetValue = ChallengerBetValue }
@@ -482,6 +495,8 @@ end
 
 -- 刷新游戏房间到游戏状态
 function RefreshGameRoomToEnterGameState(roomState, isInit)
+    print(string.format('*****当前游戏状态:%d 初始化:%s', roomState, lua_BOLEAN_String(isInit)))
+
     if isInit or roomState == ZUJURoomState.Wait then
         -- 调用下GC回收
         lua_Call_GC()
@@ -534,10 +549,11 @@ function RefreshWaitPartOfGameByRoomState(roomStateParam, initParam)
     if roomStateParam == ZUJURoomState.Wait then
         -- body
         for position = 1, 5, 1 do
-            local PlayerState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState
-            if PlayerState ~= Player_State.JoinOK then
+            local PlayerData = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position]
+            local PlayerState = PlayerData.PlayerState
+            if PlayerState == Player_State.JoinOK then
                 -- body
-                mPlayersUIInfo[position].ZBImage.gameObject:SetActive(true)
+                mPlayersUIInfo[position].ZBImage.gameObject:SetActive(PlayerData.ReadyState == 1)
             end
         end
         RefreshZBButtonShow()
@@ -570,7 +586,8 @@ end
 -- 刷新准备按钮显示
 function RefreshZBButtonShow()
     local selfState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].PlayerState
-    if selfState ~= Player_State.JoinOK then
+    print('主角玩家状态:' .. selfState)
+    if selfState == Player_State.JoinOK then
         SetZBButtonShow(true)
     else
         SetZBButtonShow(false)
@@ -741,9 +758,94 @@ end
 
 function RefreshBettingPartOfGameByRoomState(roomStateParam, initParam)
     -- body
+    if roomStateParam == ZUJURoomState.Betting then
+        SetRounTimesText(GameData.RoomInfo.CurrentRoom.RoundTimes)
+        RefreshMasterBetState()
+        RefreshCurrentBetingCD()
+    else
+        mISUpdateBetingCD = false
+        ResetCurrentBettingCDShow()
+    end
+end
+
+-- 刷新玩家下注状态
+function RefreshMasterBetState()
+    print('*****当前下注玩家:' .. GameData.RoomInfo.CurrentRoom.BettingPosition)
+
+    -- 玩家是否已经弃牌
+    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].FoldState == 1 then
+        MasterXZButtonShow(false)
+        return
+    end
+
+    MasterXZButtonShow(true)
+    MasterJZInfoShow(false)
+
+    if GameData.RoomInfo.CurrentRoom.BettingPosition == 5 then
+        -- 自己下注处理
+        mMasterXZInfo.QPButtonGameObject:SetActive(true)
+        mMasterXZInfo.JZButtonGameObject1:SetActive(true)
+        mMasterXZInfo.GZButtonGameObject:SetActive(true)
+        mMasterXZInfo.BPButtonGameObject:SetActive(true)
+    else
+        -- 他人下注处理
+        mMasterXZInfo.QPButtonGameObject:SetActive(true)
+        mMasterXZInfo.JZButtonGameObject1:SetActive(false)
+        mMasterXZInfo.GZButtonGameObject:SetActive(false)
+        mMasterXZInfo.BPButtonGameObject:SetActive(false)
+    end
 end
 
 
+
+-- 刷新玩家下注倒计时CD
+function RefreshCurrentBetingCD()
+    local BettingPosition = GameData.RoomInfo.CurrentRoom.BettingPosition
+    mCurrentHandleCD = mPlayersUIInfo[BettingPosition].HandleCD
+    mISUpdateBetingCD = true
+    for position = 1, 5, 1 do
+        mPlayersUIInfo[position].HandleCD.gameObject:SetActive(position == BettingPosition)
+    end
+end
+
+function UpdateCurrentBettingCD()
+    if false == mISUpdateBetingCD then
+        return
+    end
+    if mCurrentHandleCD == nil then
+        return
+    end
+
+    if mCurrentHandleCD.gameObject.activeSelf == false then
+        mCurrentHandleCD.gameObject:SetActive(true)
+    end
+    local countDown = GameData.RoomInfo.CurrentRoom.CountDown
+    local maxValue = ZUJUROOM_TIME[ZUJURoomState.Betting]
+    if countDown < 0 then
+        countDown = 0
+    end
+    local fillAmount = countDown / maxValue
+    mCurrentHandleCD.fillAmount = fillAmount
+
+    -- 颜色设置
+    --[[
+    if fillAmount > 0.63 then
+        mCurrentHandleCD.color = m_CheckColorOf1
+    elseif fillAmount > 0.38 then
+        mCurrentHandleCD.color = m_CheckColorOf2
+    else
+        mCurrentHandleCD.color = m_CheckColorOf3
+    end
+    ]]
+end
+
+-- CD显示还原
+function ResetCurrentBettingCDShow()
+    local BettingPosition = GameData.RoomInfo.CurrentRoom.BettingPosition
+    if BettingPosition > 0 then
+        mPlayersUIInfo[BettingPosition].HandleCD.gameObject:SetActive(false)
+    end
+end
 
 -- ===============弃牌、加注、跟注、比牌===============--
 
@@ -822,11 +924,18 @@ function MasterCMImageGameObjectShow(showParam)
     mMasterXZInfo.CMImageGameObject:SetActive(showParam)
 end
 
+
+
 -- ===============【比牌阶段】【6】 ZUJURoomState.CardVS===============--
 
 
 function RefreshCardVSPartOfGameByRoomState(roomStateParam, initParam)
     -- body
+    if roomStateParam == ZUJURoomState.CardVS then
+        VSPKShow(true)
+    else
+        VSPKShow(false)
+    end
 end
 
 -- 设置VSPK显示
@@ -837,6 +946,8 @@ function VSPKShow(showParam)
     end
     mVSPK:SetActive(showParam)
 end
+
+
 
 -- ===============【结算阶段】【7】 ZUJURoomState.Settlement===============--
 
@@ -859,3 +970,80 @@ end
 function OnNotifyZUJUDeletePlayerEvent(positionParam)
     ResetPlayerInfo2Defaul(positionParam)
 end
+
+
+-- ===============================================================================
+-- 模拟测试模块
+
+function Test1()
+    this.transform:Find('Canvas/TestButtons/Button1'):GetComponent('Button').onClick:AddListener( function() OnTestButtonsClick(1) end)
+    this.transform:Find('Canvas/TestButtons/Button2'):GetComponent('Button').onClick:AddListener( function() OnTestButtonsClick(2) end)
+    this.transform:Find('Canvas/TestButtons/Button3'):GetComponent('Button').onClick:AddListener( function() OnTestButtonsClick(3) end)
+    this.transform:Find('Canvas/TestButtons/Button4'):GetComponent('Button').onClick:AddListener( function() OnTestButtonsClick(4) end)
+end
+
+-- 测试按钮响应
+function OnTestButtonsClick(indexParam)
+    if indexParam == 1 then
+        -- TODO 测试 房间状态变化
+        local roomState = GameData.RoomInfo.CurrentRoom.RoomState
+        roomState = roomState + 1
+        if roomState > ZUJURoomState.Settlement then
+            roomState = ZUJURoomState.Wait
+        end
+
+        if roomState == ZUJURoomState.SubduceBet then
+            -- 扣除底注阶段
+            for index = 1, 5, 1 do
+                local ChallengeWinnerPosition = index
+                local ChallengerBetValue = 100
+                local betChipEventArg = { PositionValue = ChallengeWinnerPosition, BetValue = ChallengerBetValue }
+                CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyZUJUBettingEvent, betChipEventArg)
+            end
+        elseif roomState == ZUJURoomState.Betting then
+            -- 下注阶段
+            local RoundTimes = 1
+            local BettingPosition = 1
+            local MingCardBetMin = 20
+            local DarkCardBetMin = 10
+
+            BettingPosition = GameData.PlayerPositionConvert2ShowPosition(BettingPosition)
+            MingCardBetMin = GameConfig.GetFormatColdNumber(MingCardBetMin)
+            DarkCardBetMin = GameConfig.GetFormatColdNumber(DarkCardBetMin)
+
+            GameData.RoomInfo.CurrentRoom.RoundTimes = RoundTimes
+            GameData.RoomInfo.CurrentRoom.BettingPosition = BettingPosition
+            GameData.RoomInfo.CurrentRoom.MingCardBetMin = MingCardBetMin
+            GameData.RoomInfo.CurrentRoom.DarkCardBetMin = DarkCardBetMin
+
+        end
+
+        GameData.SetZUJURoomState(roomState)
+    elseif indexParam == 2 then
+        local RoundTimes = GameData.RoomInfo.CurrentRoom.RoundTimes + 1
+        local BettingPosition = GameData.RoomInfo.CurrentRoom.BettingPosition + 1
+        local MingCardBetMin = 20
+        local DarkCardBetMin = 10
+        if BettingPosition > 5 then
+            BettingPosition = 1
+        end
+
+        BettingPosition = GameData.PlayerPositionConvert2ShowPosition(BettingPosition)
+        MingCardBetMin = GameConfig.GetFormatColdNumber(MingCardBetMin)
+        DarkCardBetMin = GameConfig.GetFormatColdNumber(DarkCardBetMin)
+
+        GameData.RoomInfo.CurrentRoom.RoundTimes = RoundTimes
+        GameData.RoomInfo.CurrentRoom.BettingPosition = BettingPosition
+        GameData.RoomInfo.CurrentRoom.MingCardBetMin = MingCardBetMin
+        GameData.RoomInfo.CurrentRoom.DarkCardBetMin = DarkCardBetMin
+
+        GameData.SetZUJURoomState(ZUJURoomState.Betting)
+    elseif indexParam == 3 then
+
+    else
+
+    end
+
+end
+
+

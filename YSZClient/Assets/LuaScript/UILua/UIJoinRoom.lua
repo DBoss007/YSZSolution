@@ -76,5 +76,5 @@ end
 
 -- 请求进入房间
 function SendJoinRoomMessage()
-	NetMsgHandler.Send_CS_Enter_Room(tonumber(roomID))
+	NetMsgHandler.Send_CS_JH_Enter_Room1(tonumber(roomID))
 end
