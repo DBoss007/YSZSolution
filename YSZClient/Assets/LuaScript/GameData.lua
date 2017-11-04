@@ -494,6 +494,9 @@ end
 function GameData.SetZUJURoomState(roomState)
     GameData.RoomInfo.CurrentRoom.RoomState = roomState
     GameData.RoomInfo.CurrentRoom.CountDown = ZUJUROOM_TIME[roomState]
+    if GameData.RoomInfo.CurrentRoom.CountDown == nil then
+        print('*****组局厅房间状态:'..roomState .. '有误')
+    end
     CS.EventDispatcher.Instance:TriggerEvent(EventDefine.UpdateRoomState, roomState)
 end
 

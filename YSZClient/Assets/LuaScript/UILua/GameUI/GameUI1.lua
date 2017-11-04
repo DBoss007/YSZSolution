@@ -600,9 +600,10 @@ function OnNotifyZUJUPlayerReadyStateEvent(positionParam)
     if positionParam == 5 then
         SetZBButtonShow(false)
     end
-
     local ReadyState = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam].ReadyState
-    mPlayersUIInfo[position].ZBImage.gameObject:SetActive(ReadyState == 1)
+    print(string.format('玩家：%d 准备状态:%d', positionParam, ReadyState))
+
+    mPlayersUIInfo[positionParam].ZBImage.gameObject:SetActive(ReadyState == 1)
 end
 
 

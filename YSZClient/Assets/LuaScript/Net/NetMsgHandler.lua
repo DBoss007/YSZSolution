@@ -493,8 +493,8 @@ end
 -- 请求登录游戏服务器
 function NetMsgHandler.Send_CS_Login()
     local message = CS.Net.PushMessage()
-   -- message:PushString(GameData.LoginInfo.Account)
-    message:PushString('AccountA')
+    message:PushString(GameData.LoginInfo.Account)
+    --message:PushString('AccountA')
     message:PushUInt16(GameData.LoginInfo.PlatformType)
     message:PushString(GameData.LoginInfo.AccountName)
     message:PushUInt16(GameData.ChannelCode)
@@ -2721,6 +2721,7 @@ function NetMsgHandler.Received_CS_JH_Ready(message)
     else
         CS.BubblePrompt.Show(data.GetString("CS_JH_Ready_Error_" .. resultType), "GameUI1")
     end
+    print("=====CS_JH_Ready ID:" .. resultType)
 end
 
 
