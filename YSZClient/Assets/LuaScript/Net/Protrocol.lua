@@ -98,6 +98,10 @@ ProtrocolID =
     S_JH_Delete_Player                       = 807,  -- 组局厅通知删除一个玩家
     CS_JH_Exit_Room                          = 808,  -- 组局厅请求离开房间(以及反馈)
     CS_JH_Ready                              = 809,  -- 组局厅玩家准备(以及反馈)
+    CS_JH_Betting                            = 810,  -- 组局厅玩家下注(加注,跟注)
+    CS_JH_VS_Card                            = 811,  -- 组局厅玩家请求比牌(反馈)
+    CS_JH_Drop_Card                          = 812,  -- 组局厅玩家请求弃牌(反馈广播)
+    CS_JH_Look_Card                          = 813,  -- 组局厅玩家请求看牌(反馈广播)
     
 
 

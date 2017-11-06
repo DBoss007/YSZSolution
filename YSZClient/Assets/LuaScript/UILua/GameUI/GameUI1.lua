@@ -11,6 +11,22 @@ local mVSPKTable =
     PKPlayer2 = nil,
     PKVImage = nil,
     PKSImage = nil,
+    FailImage1 = nil,
+    FailImage2 = nil,
+    PKPos =
+    {
+        [1] = nil,
+        [2] = nil,
+        [3] = nil,
+        [4] = nil,
+        [5] = nil,
+    },
+
+    PKPosTargets =
+    {
+        [1] = nil,
+        [2] = nil,
+    }
 }
 
 -- 玩家组件数据
@@ -20,6 +36,7 @@ local PlayerItem =
     YQButton = nil,
     ZXButton = nil,
     HeadIcon = nil,
+    NameText = nil,
     HandleCD = nil,
     GoldInfo = nil,
     GoldText = nil,
@@ -35,6 +52,7 @@ local PlayerItem =
     JZImage = nil,
     GZImage = nil,
     ZBImage = nil,
+    VSOKButtonGameObject = nil,
 }
 
 -- 玩家UI元素集合
@@ -110,7 +128,6 @@ local mRoomInfo =
 local mCurrentHandleCD = nil
 local mISUpdateBetingCD = false
 
-
 -- 初始化UI元素
 function InitUIElement()
     -- body
@@ -120,8 +137,15 @@ function InitUIElement()
     mVSPKTable.PKPlayer1 = this.transform:Find('Canvas/VSPK/PKPlayer1')
     mVSPKTable.PKPlayer2 = this.transform:Find('Canvas/VSPK/PKPlayer2')
     mVSPKTable.PKPlayer2 = this.transform:Find('Canvas/VSPK/PKPlayer2')
-    mVSPKTable.PKVImage = this.transform:Find('Canvas/VSPK/PKVImage'):GetComponent('Image')
-    mVSPKTable.PKSImage = this.transform:Find('Canvas/VSPK/PKSImage'):GetComponent('Image')
+    mVSPKTable.PKVImage = this.transform:Find('Canvas/VSPK/PKVImage')
+    mVSPKTable.PKSImage = this.transform:Find('Canvas/VSPK/PKSImage')
+    mVSPKTable.FailImage1 = this.transform:Find('Canvas/VSPK/PKPlayer1/FailImage')
+    mVSPKTable.FailImage2 = this.transform:Find('Canvas/VSPK/PKPlayer2/FailImage')
+    for index = 1, 5, 1 do
+        mVSPKTable.PKPos[index] = this.transform:Find('Canvas/VSPK/PKPos' .. index)
+    end
+    mVSPKTable.PKPosTargets[1] = this.transform:Find('Canvas/VSPK/PKPosTarget1')
+    mVSPKTable.PKPosTargets[2] = this.transform:Find('Canvas/VSPK/PKPosTarget2')
 
     InitPlayerUIElement()
     -- 玩家下注模块
@@ -172,10 +196,11 @@ function InitPlayerUIElement()
         local dataItem = lua_NewTable(PlayerItem)
         local childItem = playerRoot:Find('Player' .. position)
         mPlayersUIInfo[position] = dataItem
-        dataItem.TransformRoot = childItem
+        dataItem.TransformRoot = childItem.gameObject
         dataItem.YQButton = childItem:Find('Head/YQButton')
         dataItem.ZXButton = childItem:Find('Head/ZXButton')
         dataItem.HeadIcon = childItem:Find('Head/HeadIcon'):GetComponent('Image')
+        dataItem.NameText = childItem:Find('Head/HeadIcon/NameText'):GetComponent('Text')
         dataItem.HandleCD = childItem:Find('Head/HeadIcon/HandleCD'):GetComponent('Image')
         dataItem.GoldInfo = childItem:Find('GoldInfo')
         dataItem.GoldText = childItem:Find('GoldInfo/GoldIcon/Text'):GetComponent('Text')
@@ -189,6 +214,7 @@ function InitPlayerUIElement()
         dataItem.JZImage = childItem:Find('JZImage')
         dataItem.GZImage = childItem:Find('GZImage')
         dataItem.ZBImage = childItem:Find('ZBImage')
+        dataItem.VSOKButtonGameObject = childItem:Find('VSOKButton').gameObject
         -- 扑克牌挂接点
         for cardIndex = 1, 3, 1 do
             if dataItem.PokerPoints == nil then
@@ -211,6 +237,7 @@ function ResetPlayerInfo2Defaul(positionParam)
     mPlayersUIInfo[positionParam].YQButton.gameObject:SetActive(false)
     mPlayersUIInfo[positionParam].ZXButton.gameObject:SetActive(false)
     mPlayersUIInfo[positionParam].HeadIcon.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].NameText.text = ''
     mPlayersUIInfo[positionParam].HandleCD.gameObject:SetActive(false)
     mPlayersUIInfo[positionParam].GoldInfo.gameObject:SetActive(false)
     mPlayersUIInfo[positionParam].BetingInfo.gameObject:SetActive(false)
@@ -219,6 +246,7 @@ function ResetPlayerInfo2Defaul(positionParam)
     mPlayersUIInfo[positionParam].JZImage.gameObject:SetActive(false)
     mPlayersUIInfo[positionParam].GZImage.gameObject:SetActive(false)
     mPlayersUIInfo[positionParam].ZBImage.gameObject:SetActive(false)
+    mPlayersUIInfo[positionParam].VSOKButtonGameObject:SetActive(false)
     mPlayersUIInfo[positionParam].BankerTag.gameObject:SetActive(false)
 end
 
@@ -240,6 +268,7 @@ function SetPlayerBaseInfo(positionParam)
     if PlayerState ~= Player_State.None then
         SetPlayerHeadIcon(positionParam)
         SetPlayerGoldValue(positionParam)
+        SetPlayerNameText(positionParam)
     end
     print(string.format('玩家:%d 状态:%d', positionParam, PlayerState))
 end
@@ -257,6 +286,15 @@ function SetPlayerHeadIcon(positionParam)
         return
     end
     mPlayersUIInfo[positionParam].HeadIcon:ResetSpriteByName(GameData.GetRoleIconSpriteName(GameData.RoleInfo.AccountIcon), false)
+end
+
+-- 设置玩家名字
+function SetPlayerNameText(positionParam)
+    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam].PlayerState == Player_State.None then
+        return
+    end
+    local PlayerInfo = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam]
+    mPlayersUIInfo[positionParam].NameText.text = PlayerInfo.Name
 end
 
 -- 还原UI默认基础显示状态
@@ -334,6 +372,7 @@ function WindowOpened()
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUAddPlayerEvent, OnNotifyZUJUAddPlayerEvent)
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUDeletePlayerEvent, OnNotifyZUJUDeletePlayerEvent)
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUBettingEvent, OnNotifyZUJUBettingEvent)
+    CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUDropCardEvent, OnNotifyZUJUDropCardEvent)
 
 end
 
@@ -346,6 +385,7 @@ function WindowClosed()
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUAddPlayerEvent, OnNotifyZUJUAddPlayerEvent)
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUDeletePlayerEvent, OnNotifyZUJUDeletePlayerEvent)
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUBettingEvent, OnNotifyZUJUBettingEvent)
+    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUDropCardEvent, OnNotifyZUJUDropCardEvent)
 
 end
 
@@ -374,13 +414,18 @@ function AddButtonHandlers()
     this.transform:Find('Canvas/MasterInfo/ZBButton'):GetComponent('Button').onClick:AddListener(OnZBButtonClick)
 
     this.transform:Find('Canvas/MasterInfo/JZInfo'):GetComponent('Button').onClick:AddListener(OnJZHideClick)
-    this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton1'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(1) end)
-    this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton2'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(2) end)
-    this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton3'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(3) end)
-    this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton4'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(4) end)
+    this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton1'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(2) end)
+    this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton2'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(3) end)
+    this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton3'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(4) end)
+    this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton4'):GetComponent('Button').onClick:AddListener( function() OnJZButtonOKClick(5) end)
     -- 每个位置要求按钮call
     for position = 1, 5, 1 do
         local childItem = this.transform:Find('Canvas/Players/Player' .. position .. '/Head/YQButton'):GetComponent('Button').onClick:AddListener( function() OnYQButtonClick(position) end)
+    end
+
+    for posIndex = 1, 4, 1 do
+        local childItem = this.transform:Find('Canvas/Players/Player' .. posIndex .. '/VSOKButton'):GetComponent('Button')
+        childItem.onClick:AddListener( function() OnVSOKButtonOnclick(posIndex) end)
     end
 
 end
@@ -621,13 +666,6 @@ function RefreshSubduceBetPartOfGameByRoomState(roomStateParam, initParam)
     end
 end
 
--- 刷新已经下注金额
-function RefreshAllBets()
-
-
-
-end
-
 -- 押注筹码到桌子上
 function BetChipToDesk(betValueParam, positionParam)
     local startPoint = nil
@@ -764,9 +802,13 @@ function RefreshBettingPartOfGameByRoomState(roomStateParam, initParam)
         SetRounTimesText(GameData.RoomInfo.CurrentRoom.RoundTimes)
         RefreshMasterBetState()
         RefreshCurrentBetingCD()
+        SetBetAllValueText(GameData.RoomInfo.CurrentRoom.BetAllValue)
+        SetRounTimesText(GameData.RoomInfo.CurrentRoom.RoundTimes)
     else
         mISUpdateBetingCD = false
         ResetCurrentBettingCDShow()
+        MasterXZButtonShow(false)
+        MasterJZInfoShow(false)
     end
 end
 
@@ -808,6 +850,7 @@ function RefreshCurrentBetingCD()
     for position = 1, 5, 1 do
         mPlayersUIInfo[position].HandleCD.gameObject:SetActive(position == BettingPosition)
     end
+
 end
 
 function UpdateCurrentBettingCD()
@@ -855,6 +898,7 @@ end
 function OnQPButtonClick()
     -- body
     print('弃牌按钮点击')
+    NetMsgHandler.Send_CS_JH_Drop_Card()
 end
 
 -- 玩家加注按钮call
@@ -868,12 +912,49 @@ end
 function OnGZButtonClick()
     -- body
     print('跟注按钮点击')
+    local bettingValue = 0
+    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].CheckState == 0 then
+        bettingValue = GameData.RoomInfo.CurrentRoom.DarkCardBetMin
+    else
+        bettingValue = GameData.RoomInfo.CurrentRoom.MingCardBetMin
+    end
+
+    TrySend_CS_JH_Betting(1, bettingValue)
 end
 
 -- 玩家比牌按钮call
 function OnBPButtonClick()
     -- body
     print("玩家比牌按钮点击")
+
+    for index = 1, 4, 1 do
+        local playerData = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[index]
+        if playerData.PlayerState == Player_State.JoinOK then
+            if playerData.CompareResult == 1 or playerData.FoldState == 1 then
+                -- 玩家已经弃牌
+                return
+            else
+                mPlayersUIInfo[index].VSOKButtonGameObject:SetActive(true)
+            end
+        end
+    end
+
+end
+
+-- 选择比牌玩家call
+function OnVSOKButtonOnclick(positionParam)
+    -- 还原状态
+    for index = 1, 4, 1 do
+        mPlayersUIInfo[index].VSOKButtonGameObject:SetActive(false)
+    end
+    local playerData = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam]
+    if playerData.PlayerState == Player_State.JoinOK then
+        if playerData.CompareResult == 1 or playerData.FoldState == 1 then
+            -- 玩家已经弃牌
+        else
+            NetMsgHandler.Send_CS_JH_VS_Card(playerData.AccountID, 1)
+        end
+    end
 end
 
 -- 玩家加注隐藏按钮call
@@ -887,6 +968,24 @@ end
 function OnJZButtonOKClick(jiazhuParam)
     -- body
     print('加注筹码:' .. jiazhuParam)
+
+    local tmpBet = 0
+
+    local betValue = 40
+
+    TrySend_CS_JH_Betting(2, betValue)
+end
+
+-- 尝试下注请求
+function TrySend_CS_JH_Betting(betType, betValue)
+    --[[
+    if GameData.RoleInfo.GoldCount < betValue then
+        -- 金币不足
+        CS.BubblePrompt.Show(data.GetString("金币不足,无法下注"), "GameUI1")
+        return
+    end
+    ]]
+    NetMsgHandler.Send_CS_JH_Betting(GameData.RoomInfo.CurrentRoom.RoomID, betType, betValue)
 end
 
 
@@ -927,6 +1026,12 @@ function MasterCMImageGameObjectShow(showParam)
 end
 
 
+-- 玩家弃牌通知
+function OnNotifyZUJUDropCardEvent(positionParam)
+    print('弃牌玩家:' .. positionParam)
+end
+
+
 
 -- ===============【比牌阶段】【6】 ZUJURoomState.CardVS===============--
 
@@ -935,6 +1040,7 @@ function RefreshCardVSPartOfGameByRoomState(roomStateParam, initParam)
     -- body
     if roomStateParam == ZUJURoomState.CardVS then
         VSPKShow(true)
+        PlayCardVSAnimation()
     else
         VSPKShow(false)
     end
@@ -947,14 +1053,106 @@ function VSPKShow(showParam)
         return
     end
     mVSPK:SetActive(showParam)
+    if showParam == false then
+        mVSPKTable.FailImage1.gameObject:SetActive(false)
+        mVSPKTable.FailImage2.gameObject:SetActive(false)
+    end
+end
+
+-- 播放比牌动画
+function PlayCardVSAnimation()
+    this:DelayInvoke(0, function() PlayCardVSAnimationStep1() end)
+    this:DelayInvoke(0.5, function() PlayCardVSAnimationStep2() end)
+    this:DelayInvoke(1.0, function() SetCardVSResult() end)
+end
+
+-- PK动画第一步
+function PlayCardVSAnimationStep1()
+    local ChallengerPosition = GameData.RoomInfo.CurrentRoom.ChallengerPosition
+    local ActorPosition = GameData.RoomInfo.CurrentRoom.ActorPosition
+
+    mPlayersUIInfo[ChallengerPosition].TransformRoot:SetActive(false)
+    mPlayersUIInfo[ActorPosition].TransformRoot:SetActive(false)
+
+    -- 玩家1
+    SetChallengerInfo(mVSPKTable.PKPlayer1, ChallengerPosition)
+    -- 玩家2
+    SetChallengerInfo(mVSPKTable.PKPlayer2, ActorPosition)
+    -- 还原默认状态
+    mVSPKTable.FailImage1.gameObject:SetActive(false)
+    mVSPKTable.FailImage2.gameObject:SetActive(false)
+
+    local tweenScript1 = mVSPKTable.PKPlayer1:GetComponent('TweenTransform')
+    tweenScript1:ResetToBeginning()
+    tweenScript1.from = mVSPKTable.PKPos[ChallengerPosition]
+    tweenScript1.to = mVSPKTable.PKPosTargets[1]
+    tweenScript1:Play(true)
+
+    local tweenScript2 = mVSPKTable.PKPlayer2:GetComponent('TweenTransform')
+    tweenScript2:ResetToBeginning()
+    tweenScript2.from = mVSPKTable.PKPos[ActorPosition]
+    tweenScript2.to = mVSPKTable.PKPosTargets[2]
+    tweenScript2:Play(true)
+
+    mVSPKTable.PKVImage.gameObject:SetActive(false)
+    mVSPKTable.PKSImage.gameObject:SetActive(false)
+
+end
+
+function PlayCardVSAnimationStep2()
+    mVSPKTable.PKVImage.gameObject:SetActive(true)
+    mVSPKTable.PKSImage.gameObject:SetActive(true)
+
+    local tweenPosition1 = mVSPKTable.PKVImage:GetComponent('TweenPosition')
+    tweenPosition1:ResetToBeginning()
+    tweenPosition1:Play(true)
+
+    local tweenPosition2 = mVSPKTable.PKSImage:GetComponent('TweenPosition')
+    tweenPosition2:ResetToBeginning()
+    tweenPosition2:Play(true)
+
 end
 
 
+-- 设置挑战者基础信息
+function SetChallengerInfo(target, positionParam)
+    local playerData = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam]
+    local head1 = target:Find('HeadIcon'):GetComponent('Image')
+    head1:ResetSpriteByName(GameData.GetRoleIconSpriteName(playerData.IconID), false)
+    target:Find('Text'):GetComponent('Text').text = playerData.Name
+end
+
+
+-- 设置比牌结果
+function SetCardVSResult()
+    local ChallengerPosition = GameData.RoomInfo.CurrentRoom.ChallengerPosition
+    local ActorPosition = GameData.RoomInfo.CurrentRoom.ActorPosition
+    local ChallengeWinnerPosition = GameData.RoomInfo.CurrentRoom.ChallengeWinnerPosition
+
+    if ChallengerPosition == ChallengeWinnerPosition then
+        mVSPKTable.FailImage1.gameObject:SetActive(false)
+        mVSPKTable.FailImage2.gameObject:SetActive(true)
+    else
+        mVSPKTable.FailImage1.gameObject:SetActive(true)
+        mVSPKTable.FailImage2.gameObject:SetActive(false)
+    end
+
+    -- 玩家信息还原
+    local ChallengerPosition = GameData.RoomInfo.CurrentRoom.ChallengerPosition
+    local ActorPosition = GameData.RoomInfo.CurrentRoom.ActorPosition
+    mPlayersUIInfo[ChallengerPosition].TransformRoot:SetActive(true)
+    mPlayersUIInfo[ActorPosition].TransformRoot:SetActive(true)
+end
 
 -- ===============【结算阶段】【7】 ZUJURoomState.Settlement===============--
 
 function RefreshSettlementPartOfGameByRoomState(roomStateParam, initParam)
     -- body
+    if roomStateParam == ZUJURoomState.Settlement then
+
+    else
+
+    end
 end
 
 
@@ -1005,7 +1203,7 @@ function OnTestButtonsClick(indexParam)
         elseif roomState == ZUJURoomState.Betting then
             -- 下注阶段
             local RoundTimes = 1
-            local BettingPosition = 1
+            local BettingPosition = 5
             local MingCardBetMin = 20
             local DarkCardBetMin = 10
 
@@ -1017,6 +1215,18 @@ function OnTestButtonsClick(indexParam)
             GameData.RoomInfo.CurrentRoom.BettingPosition = BettingPosition
             GameData.RoomInfo.CurrentRoom.MingCardBetMin = MingCardBetMin
             GameData.RoomInfo.CurrentRoom.DarkCardBetMin = DarkCardBetMin
+
+        elseif roomState == ZUJURoomState.CardVS then
+
+            -- 比牌阶段
+            local ChallengerPosition = 1
+            local ActorPosition = 5
+            local ChallengeWinnerPosition = 5
+
+            GameData.RoomInfo.CurrentRoom.ChallengerPosition = ChallengerPosition
+            GameData.RoomInfo.CurrentRoom.ActorPosition = ActorPosition
+            GameData.RoomInfo.CurrentRoom.ChallengeWinnerPosition = ChallengeWinnerPosition
+            GameData.RoomInfo.CurrentRoom.BetAllValue = BetAllValue
 
         end
 
@@ -1030,20 +1240,49 @@ function OnTestButtonsClick(indexParam)
             BettingPosition = 1
         end
 
-        BettingPosition = GameData.PlayerPositionConvert2ShowPosition(BettingPosition)
-        MingCardBetMin = GameConfig.GetFormatColdNumber(MingCardBetMin)
-        DarkCardBetMin = GameConfig.GetFormatColdNumber(DarkCardBetMin)
-
         GameData.RoomInfo.CurrentRoom.RoundTimes = RoundTimes
         GameData.RoomInfo.CurrentRoom.BettingPosition = BettingPosition
         GameData.RoomInfo.CurrentRoom.MingCardBetMin = MingCardBetMin
         GameData.RoomInfo.CurrentRoom.DarkCardBetMin = DarkCardBetMin
+        print("*****测试下注玩家:" .. GameData.RoomInfo.CurrentRoom.BettingPosition)
 
         GameData.SetZUJURoomState(ZUJURoomState.Betting)
     elseif indexParam == 3 then
+        -- 比牌阶段
+        local ChallengerPosition = 1
+        local ActorPosition = 3
+        local ChallengeWinnerPosition = 3
 
-    else
+        GameData.RoomInfo.CurrentRoom.ChallengerPosition = ChallengerPosition
+        GameData.RoomInfo.CurrentRoom.ActorPosition = ActorPosition
+        GameData.RoomInfo.CurrentRoom.ChallengeWinnerPosition = ChallengeWinnerPosition
+        GameData.RoomInfo.CurrentRoom.BetAllValue = BetAllValue
+        GameData.SetZUJURoomState(ZUJURoomState.CardVS)
+    elseif indexParam == 4 then
+        -- 结算阶段
+        local winnerCount = 3
 
+        for index = 1, winnerCount, 1 do
+            local WinnerPosition = index
+            local WinGoldValue = index * 10000
+            local GoldValue = index * 20000
+
+            WinnerPosition = GameData.PlayerPositionConvert2ShowPosition(WinnerPosition)
+            WinGoldValue = GameConfig.GetFormatColdNumber(WinGoldValue)
+            GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
+
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[WinnerPosition].GoldValue = GoldValue
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[WinnerPosition].WinGoldValue = WinGoldValue
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[WinnerPosition].IsWinner = true
+        end
+        -- 本局自己客户端需要量牌玩家
+        local showCount = 5
+        for showIndex = 1, showCount, 1 do
+            local position = showIndex
+            position = GameData.PlayerPositionConvert2ShowPosition(position)
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].IsShowPokerCard = true
+        end
+        GameData.SetZUJURoomState(ZUJURoomState.Settlement)
     end
 
 end

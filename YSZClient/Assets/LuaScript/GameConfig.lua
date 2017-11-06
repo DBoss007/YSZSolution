@@ -14,7 +14,7 @@ GameConfig =
     -- 邀请好友一起玩游戏url
     InviteUrl = "http://jhysz.api.changlaith.com/downpage/main.php",
 
-    -- 连接的HubServerURL 域名(正式服务器:clysz.hub.changlaith.com 苹果审核域名:jhysz.v10101hub.changlaith.com 本地服务器:10.8.3.123，
+    -- 连接的HubServerURL 域名(正式服务器:clysz.hub.changlaith.com 苹果审核域名:jhysz.v10101hub.changlaith.com 本地服务器:10.8.3.123)
     -- 外网测试服:118.190.159.166)
     HubServerURL = "10.8.3.234",
     GameServerURL = "jhysz.s10.changlaith.com",
@@ -161,6 +161,8 @@ EventDefine =
     NotifyZUJUDeletePlayerEvent = "NotifyZUJUDeletePlayerEvent",
     -- 组局厅玩家下注通知
     NotifyZUJUBettingEvent = "NotifyZUJUBettingEvent",
+    -- 组局厅玩家弃牌通知
+    NotifyZUJUDropCardEvent = "NotifyZUJUDropCardEvent",
 
 }
 
@@ -491,3 +493,24 @@ ZUJUROOM_TIME =
     [ZUJURoomState.CardVS] = 15,
     [ZUJURoomState.Settlement] = 3,
 }
+
+-- 明牌(看牌)下注倍率
+BettingMingCardValue = 
+{
+    [1] = 2,
+    [2] = 5,
+    [3] = 10,
+    [4] = 20,
+    [5] = 40,
+}
+
+-- 暗牌(焖鸡)下注倍率
+BettingDarkCardValue = 
+{
+    [1] = 1,
+    [2] = 2,
+    [3] = 5,
+    [4] = 10,
+    [5] = 20,
+}
+

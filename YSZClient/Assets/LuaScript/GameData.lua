@@ -247,7 +247,7 @@ function GameData.InitZuJuRoomInfo()
     GameData.RoomInfo.CurrentRoom =
     {
         -- 房间ID
-        RoomID = 0,
+        RoomID = 123,
         -- 房主ID
         MasterID = 1,
         -- 房间类型
@@ -261,9 +261,9 @@ function GameData.InitZuJuRoomInfo()
         -- 比闷模式(必闷1圈 必闷3圈)
         GameRule = 0,
         -- 房间底注
-        BetMin = 0,
+        BetMin = 10,
         -- 下注上限
-        BetMax = 1,
+        BetMax = 400,
         -- 房间状态
         RoomState = ZUJURoomState.Wait,
         -- 当前状态CD
@@ -294,22 +294,25 @@ function GameData.InitZuJuRoomInfo()
         ActorPosition = 0,
         -- 挑战赢家位置
         ChallengeWinnerPosition = 0,
+        -- 名牌下注档次
+        MingCardBettingValue =
+        {
+            [1] = 2,
+            [2] = 5,
+            [3] = 10,
+            [4] = 20,
+            [5] = 40,
+        },
 
-        -- 本局结算信息
-        -- 赢家ID
-        WinnerID = 0,
-        -- 赢家位置
-        WinnerPosition = 0,
-        -- 赢家赢取金币
-        WinGoldValue = 0,
-        -- 赢家当前金币值
-        WinnerGoldValue = 0,
-        -- 赢家列表 [1] = { Position = 1, WinGoldValue = 100, GoldValue = 120,}
-        WinnerList = { },
-
-        -- 亮牌玩家列表  [1] = {Position = 1,PokerCard[1] = {PokerType = 1, PokerNumber = 1,},PokerCard[2] = {PokerType = 1, PokerNumber = 1,},PokerCard[3] = {PokerType = 1, PokerNumber = 1,} }
-        -- 直接映射到具体位置玩家扑克列表
-
+        -- 暗牌下注档次
+        DarkCardBettingValue =
+        {
+            [1] = 2,
+            [2] = 5,
+            [3] = 10,
+            [4] = 20,
+            [5] = 40,
+        }
 
     }
     -- 房间列表信息
@@ -317,16 +320,19 @@ function GameData.InitZuJuRoomInfo()
         -- 初始化玩家基础信息
         local playerInfo = lua_NewTable(GameData.ZuJuPlayer)
         playerInfo.AccountID = 0
+        playerInfo.IconID = i
+        playerInfo.IconUrl = ''
         playerInfo.Position = i
         playerInfo.Name = '帝濠' .. i
         playerInfo.PlayerState = Player_State.None
         if i == 5 or i == 1 then
-             --playerInfo.PlayerState = Player_State.JoinOK
+            -- playerInfo.PlayerState = Player_State.JoinOK
         end
         playerInfo.CheckState = 0
         playerInfo.FoldState = 0
         playerInfo.CompareState = 0
         playerInfo.CompareResult = 0
+        playerInfo.BetChipValue = 0
         playerInfo.PokerList = { }
 
         -- 初始化玩家扑克牌
@@ -339,6 +345,21 @@ function GameData.InitZuJuRoomInfo()
     end
 
 end
+
+-- 初始化对战房间当前下注倍率(名牌 暗牌)
+function GameData.InitZUJURoomBettingValue(betMinParam)
+    for index = 1, 5, 1 do
+        GameData.RoomInfo.CurrentRoom.MingCardBettingValue[index] = betMinParam * BettingMingCardValue[index]
+        GameData.RoomInfo.CurrentRoom.DarkCardBettingValue[index] = betMinParam * BettingDarkCardValue[index]
+    end
+end
+
+-- 获取当前组局厅对应等级下注值
+function GameData.GetZUJUBettingValue(betLevel)
+
+end
+
+
 
 -- 组局厅玩家显示位置转换
 function GameData.PlayerPositionConvert2ShowPosition(tagPositionParam)
@@ -495,7 +516,7 @@ function GameData.SetZUJURoomState(roomState)
     GameData.RoomInfo.CurrentRoom.RoomState = roomState
     GameData.RoomInfo.CurrentRoom.CountDown = ZUJUROOM_TIME[roomState]
     if GameData.RoomInfo.CurrentRoom.CountDown == nil then
-        print('*****组局厅房间状态:'..roomState .. '有误')
+        print('*****组局厅房间状态:' .. roomState .. '有误')
     end
     CS.EventDispatcher.Instance:TriggerEvent(EventDefine.UpdateRoomState, roomState)
 end
