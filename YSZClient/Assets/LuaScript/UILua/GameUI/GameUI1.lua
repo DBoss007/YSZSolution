@@ -72,10 +72,14 @@ local mMasterXZInfo =
 
     -- 加注模块组件
     JZButtonGameObject = nil,
-    JZButton1Text = nil,
-    JZButton2Text = nil,
-    JZButton3Text = nil,
-    JZButton4Text = nil,
+    -- 加注按钮text
+    JZButtonTexts =
+    {
+        [1] = nil,
+        [2] = nil,
+        [3] = nil,
+        [4] = nil,
+    },
     -- 玩家自己筹码组件
     CMImageGameObject = nil,
     -- 玩家准备按钮组件
@@ -159,10 +163,13 @@ function InitUIElement()
 
     mMasterXZInfo.JZButtonGameObject = this.transform:Find('Canvas/MasterInfo/JZInfo').gameObject
     mMasterXZInfo.ZBButtonGameObject = this.transform:Find('Canvas/MasterInfo/ZBButton').gameObject
-    mMasterXZInfo.JZButton1Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton1/Text'):GetComponent('Text')
-    mMasterXZInfo.JZButton2Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton2/Text'):GetComponent('Text')
-    mMasterXZInfo.JZButton3Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton3/Text'):GetComponent('Text')
-    mMasterXZInfo.JZButton4Text = this.transform:Find('Canvas/MasterInfo/JZInfo/JZButton4/Text'):GetComponent('Text')
+
+    for index = 1, 4, 1 do
+
+        mMasterXZInfo.JZButtonTexts[index] = this.transform:Find(string.format('Canvas/MasterInfo/JZInfo/JZButton%d/Text', index)):GetComponent('Text')
+
+    end
+
     mMasterXZInfo.CMImageGameObject = this.transform:Find('Canvas/Players/Player5/CMImage').gameObject
 
     -- 筹码挂接组件
@@ -316,12 +323,18 @@ end
 -- 重置扑克牌显示
 function ResetPokerCardVisible()
     for position = 1, 5, 1 do
-        for cardIndex = 1, 3, 1 do
-            SetTablePokerCardVisible(mPlayersUIInfo[position].PokerCards[cardIndex], false)
-            SetPokerCardShow(position, cardIndex, false)
-        end
+        ResetPlayerCardToDefault(position)
     end
 end
+
+-- 重置玩家扑克默认状态
+function ResetPlayerCardToDefault(positionParam)
+    for cardIndex = 1, 3, 1 do
+        SetTablePokerCardVisible(mPlayersUIInfo[positionParam].PokerCards[cardIndex], false)
+        SetPokerCardShow(positionParam, cardIndex, false)
+    end
+end
+
 
 -- 设置扑克牌显示隐藏状态
 function SetPokerCardShow(positionParam, cardIndexParam, showParam)
@@ -373,6 +386,8 @@ function WindowOpened()
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUDeletePlayerEvent, OnNotifyZUJUDeletePlayerEvent)
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUBettingEvent, OnNotifyZUJUBettingEvent)
     CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJUDropCardEvent, OnNotifyZUJUDropCardEvent)
+    CS.EventDispatcher.Instance:AddEventListener(EventDefine.NotifyZUJULookCardEvent, OnNotifyZUJULookCardEvent)
+
 
 end
 
@@ -386,6 +401,8 @@ function WindowClosed()
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUDeletePlayerEvent, OnNotifyZUJUDeletePlayerEvent)
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUBettingEvent, OnNotifyZUJUBettingEvent)
     CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJUDropCardEvent, OnNotifyZUJUDropCardEvent)
+    CS.EventDispatcher.Instance:RemoveEventListener(EventDefine.NotifyZUJULookCardEvent, OnNotifyZUJULookCardEvent)
+
 
 end
 
@@ -670,8 +687,8 @@ end
 function BetChipToDesk(betValueParam, positionParam)
     local startPoint = nil
     startPoint = CHIP_START[positionParam]
-
-    CastChipToBetArea(positionParam, betValue, tostring(positionParam), true, startPoint.position)
+    local betType = GameData.GetZUJUBettingLevel(betValueParam)
+    CastChipToBetArea(betType, betValueParam, tostring(positionParam), true, startPoint.position)
 
     -- 押注筹码音效
     PlaySoundEffect(5)
@@ -704,7 +721,23 @@ end
 
 -- 玩家下注通知call
 function OnNotifyZUJUBettingEvent(eventArgs)
+    print(string.format('****12*****玩家:%d 下注:%f', eventArgs.PositionValue, eventArgs.BetValue))
     BetChipToDesk(eventArgs.BetValue, eventArgs.PositionValue)
+    SetBetAllValueText(GameData.RoomInfo.CurrentRoom.BetAllValue)
+    SetPlayerBetValueText(eventArgs.PositionValue)
+end
+
+-- 设置玩家下注金额
+function SetPlayerBetValueText(positionParam)
+    if positionParam == 0 then
+        return
+    end
+    if mPlayersUIInfo[positionParam].BetingInfo.gameObject.activeSelf == false then
+        mPlayersUIInfo[positionParam].BetingInfo.gameObject:SetActive(true)
+    end
+    local playerData = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam]
+    mPlayersUIInfo[positionParam].BetingText.text = tostring(playerData.BetChipValue)
+
 end
 
 -- ===============【洗牌发牌】【4】 ZUJURoomState.Deal===============--
@@ -817,7 +850,7 @@ function RefreshMasterBetState()
     print('*****当前下注玩家:' .. GameData.RoomInfo.CurrentRoom.BettingPosition)
 
     -- 玩家是否已经弃牌
-    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].FoldState == 1 then
+    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].DropCardState == 1 then
         MasterXZButtonShow(false)
         return
     end
@@ -845,12 +878,15 @@ end
 -- 刷新玩家下注倒计时CD
 function RefreshCurrentBetingCD()
     local BettingPosition = GameData.RoomInfo.CurrentRoom.BettingPosition
-    mCurrentHandleCD = mPlayersUIInfo[BettingPosition].HandleCD
-    mISUpdateBetingCD = true
-    for position = 1, 5, 1 do
-        mPlayersUIInfo[position].HandleCD.gameObject:SetActive(position == BettingPosition)
+    if BettingPosition > 0 then
+        mCurrentHandleCD = mPlayersUIInfo[BettingPosition].HandleCD
+        mISUpdateBetingCD = true
+        for position = 1, 5, 1 do
+            mPlayersUIInfo[position].HandleCD.gameObject:SetActive(position == BettingPosition)
+        end
+    else
+        error('当前下注玩家位置:0有误')
     end
-
 end
 
 function UpdateCurrentBettingCD()
@@ -906,6 +942,28 @@ function OnJZButtonClick()
     -- body
     print('加注按钮点击')
     MasterJZInfoShow(true)
+    local mingBet = 0
+    local darkBet = 0
+
+    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].LookState == 0 then
+
+    else
+
+    end
+
+    for index = 1, 4, 1 do
+        mingBet, darkBet = GameData.GetZUJUBettingValue(index + 1)
+        if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].LookState == 0 then
+            mMasterXZInfo.JZButtonTexts[index].text = tostring(mingBet)
+        else
+            mMasterXZInfo.JZButtonTexts[index].text = tostring(darkBet)
+        end
+    end
+
+end
+
+function SetJZButtonBetValueText(level)
+
 end
 
 -- 玩家跟注按钮call
@@ -913,7 +971,7 @@ function OnGZButtonClick()
     -- body
     print('跟注按钮点击')
     local bettingValue = 0
-    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].CheckState == 0 then
+    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].LookState == 0 then
         bettingValue = GameData.RoomInfo.CurrentRoom.DarkCardBetMin
     else
         bettingValue = GameData.RoomInfo.CurrentRoom.MingCardBetMin
@@ -927,19 +985,45 @@ function OnBPButtonClick()
     -- body
     print("玩家比牌按钮点击")
 
+    local vsCount, playerID = CheckVSCard()
+
+    if vsCount > 1 then
+        for index = 1, 4, 1 do
+            local playerData = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[index]
+            if playerData.PlayerState == Player_State.JoinOK then
+                if playerData.CompareResult == 1 or playerData.DropCardState == 1 then
+                    -- 玩家已经弃牌
+                else
+                    mPlayersUIInfo[index].VSOKButtonGameObject:SetActive(true)
+                end
+            end
+        end
+    elseif vsCount == 1 then
+        NetMsgHandler.Send_CS_JH_VS_Card(playerID, 1)
+    else
+        -- TODO 此刻应该进入比牌阶段
+    end
+end
+
+-- 检查可以参与比牌的玩家数量
+function CheckVSCard()
+    local count = 0
+    local playerID = 0
     for index = 1, 4, 1 do
         local playerData = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[index]
         if playerData.PlayerState == Player_State.JoinOK then
-            if playerData.CompareResult == 1 or playerData.FoldState == 1 then
+            if playerData.CompareResult == 1 or playerData.DropCardState == 1 then
                 -- 玩家已经弃牌
-                return
+                CS.BubblePrompt.Show('玩家已经弃牌，请重新选择.', "GameUI1")
             else
-                mPlayersUIInfo[index].VSOKButtonGameObject:SetActive(true)
+                count = count + 1
+                playerID = playerData.AccountID
             end
         end
     end
-
+    return count, playerID
 end
+
 
 -- 选择比牌玩家call
 function OnVSOKButtonOnclick(positionParam)
@@ -949,7 +1033,7 @@ function OnVSOKButtonOnclick(positionParam)
     end
     local playerData = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[positionParam]
     if playerData.PlayerState == Player_State.JoinOK then
-        if playerData.CompareResult == 1 or playerData.FoldState == 1 then
+        if playerData.CompareResult == 1 or playerData.DropCardState == 1 then
             -- 玩家已经弃牌
         else
             NetMsgHandler.Send_CS_JH_VS_Card(playerData.AccountID, 1)
@@ -969,11 +1053,28 @@ function OnJZButtonOKClick(jiazhuParam)
     -- body
     print('加注筹码:' .. jiazhuParam)
 
-    local tmpBet = 0
+    local betValue = 10
+    local mingBet, darkBet = GameData.GetZUJUBettingValue(jiazhuParam)
+    local canJiaZhu = true
 
-    local betValue = 40
+    if GameData.RoomInfo.CurrentRoom.ZUJUPlayers[5].LookState == 0 then
+        betValue = mingBet
+        if darkBet < GameData.RoomInfo.CurrentRoom.DarkCardBetMin then
+            canJiaZhu = false
+        end
+    else
+        betValue = darkBet
+        -- 所需筹码不是
+        if mingBet < GameData.RoomInfo.CurrentRoom.MingCardBetMin then
+            canJiaZhu = false
+        end
+    end
 
-    TrySend_CS_JH_Betting(2, betValue)
+    if canJiaZhu == true then
+        TrySend_CS_JH_Betting(2, betValue)
+    else
+        print('所选筹码非加注筹码')
+    end
 end
 
 -- 尝试下注请求
@@ -989,14 +1090,7 @@ function TrySend_CS_JH_Betting(betType, betValue)
 end
 
 
--- 开牌按钮显示设置
-function MasterKPButtonShow(showParam)
-    -- body
-    if mMasterXZInfo.KPButtonGameObject.activeSelf == showParam then
-        return
-    end
-    mMasterXZInfo.KPButtonGameObject:SetActive(showParam)
-end
+
 
 -- 下注按钮显示设置
 function MasterXZButtonShow(showParam)
@@ -1029,8 +1123,31 @@ end
 -- 玩家弃牌通知
 function OnNotifyZUJUDropCardEvent(positionParam)
     print('弃牌玩家:' .. positionParam)
+    mPlayersUIInfo[positionParam].QPImage.gameObject:SetActive(true)
+    -- 弃牌音效
+    PlaySoundEffect(123)
 end
 
+
+-- =============================玩家看牌模块============================================
+
+-- 开牌按钮显示设置
+function MasterKPButtonShow(showParam)
+    -- body
+    if mMasterXZInfo.KPButtonGameObject.activeSelf == showParam then
+        return
+    end
+    mMasterXZInfo.KPButtonGameObject:SetActive(showParam)
+end
+
+-- 通知玩家已经看牌
+function OnNotifyZUJULookCardEvent(positionParam)
+
+    mPlayersUIInfo[positionParam].KPImage.gameObject:SetActive(true)
+    if positionParam == 5 then
+        -- 自己看牌 需要显示牌面
+    end
+end
 
 
 -- ===============【比牌阶段】【6】 ZUJURoomState.CardVS===============--
@@ -1169,6 +1286,7 @@ end
 -- 删除某个玩家
 function OnNotifyZUJUDeletePlayerEvent(positionParam)
     ResetPlayerInfo2Defaul(positionParam)
+    ResetPlayerCardToDefault(positionParam)
 end
 
 

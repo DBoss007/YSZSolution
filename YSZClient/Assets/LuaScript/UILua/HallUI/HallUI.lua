@@ -168,7 +168,7 @@ function OnGameStartButtonOnClick()
     -- TODO 测试
     GameData.InitCurrentRoomInfo(ROOM_TYPE.JH_ZuJu)
     NetMsgHandler.Send_CS_JH_Create_Room(10, 200, 1, 1, 1,321,200)
-    ---[[
+    --[[
     -- body
     local initParam = CS.WindowNodeInitParam("GameUI1")
     initParam.WindowData = 1

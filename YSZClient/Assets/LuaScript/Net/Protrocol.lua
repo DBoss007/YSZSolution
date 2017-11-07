@@ -102,6 +102,7 @@ ProtrocolID =
     CS_JH_VS_Card                            = 811,  -- 组局厅玩家请求比牌(反馈)
     CS_JH_Drop_Card                          = 812,  -- 组局厅玩家请求弃牌(反馈广播)
     CS_JH_Look_Card                          = 813,  -- 组局厅玩家请求看牌(反馈广播)
+    S_JH_Notify_Look_Card                    = 814,  -- 服务器广播**看牌
     
 
 

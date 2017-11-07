@@ -81,14 +81,16 @@ GameData =
         PlayerState = 0,
         -- 玩家准备状态(0准备状态默认值 1 准备 2未准备)
         ReadyState = 0,
-        -- 看牌标记(0为看牌 1看牌)
-        CheckState = 0,
+        -- 看牌标记(0未看牌 1看牌)
+        LookState = 0,
         -- 弃牌状态(0 未弃牌 1弃牌)
-        FoldState = 0,
+        DropCardState = 0,
         -- 比牌状态(0 未比牌 1比牌)
         CompareState = 0,
         -- 比牌结果(0 默认状态 1比牌输 2 比牌赢)
         CompareResult = 0,
+        -- 免费PK状态 0 不允许 1 允许
+        FreePK = 1,
         -- 扑克列表
         PokerList = { },
 
@@ -328,8 +330,8 @@ function GameData.InitZuJuRoomInfo()
         if i == 5 or i == 1 then
             -- playerInfo.PlayerState = Player_State.JoinOK
         end
-        playerInfo.CheckState = 0
-        playerInfo.FoldState = 0
+        playerInfo.LookState = 0
+        playerInfo.DropCardState = 0
         playerInfo.CompareState = 0
         playerInfo.CompareResult = 0
         playerInfo.BetChipValue = 0
@@ -356,21 +358,43 @@ end
 
 -- 获取当前组局厅对应等级下注值
 function GameData.GetZUJUBettingValue(betLevel)
-
+    return GameData.RoomInfo.CurrentRoom.MingCardBettingValue[betLevel], GameData.RoomInfo.CurrentRoom.DarkCardBettingValue[betLevel]
 end
 
+-- 更新组局厅下注总额
+function GameData.UpdateZUJUBetAllValue(betValue)
+    GameData.RoomInfo.CurrentRoom.BetAllValue = GameData.RoomInfo.CurrentRoom.BetAllValue + betValue
+end
+
+-- 获取筹码所属等级
+function GameData.GetZUJUBettingLevel(betValue)
+    local level = 1
+    local compareValue1 = 1
+    local compareValue2 = 2
+    for index = 1, 5, 1 do
+        compareValue1 = GameData.RoomInfo.CurrentRoom.MingCardBettingValue[index]
+        compareValue1 = GameConfig.GetFormatColdNumber(compareValue1)
+        compareValue2 = GameData.RoomInfo.CurrentRoom.DarkCardBettingValue[index]
+        compareValue2 = GameConfig.GetFormatColdNumber(compareValue2)
+        if compareValue2 <= betValue and betValue <= compareValue1 then
+            level = index
+            break
+        end
+    end
+    return level
+end
 
 
 -- 组局厅玩家显示位置转换
 function GameData.PlayerPositionConvert2ShowPosition(tagPositionParam)
+    local position = 0
     if tagPositionParam > 0 then
-        local position =(5 - GameData.RoomInfo.CurrentRoom.SelfPosition + tagPositionParam - 1) % 5 + 1
-        print("转换后位置:" .. position)
-        return position
+        position =(5 - GameData.RoomInfo.CurrentRoom.SelfPosition + tagPositionParam - 1) % 5 + 1
     else
         print("服务器传入位置有误:" .. tagPositionParam)
-        return 0
     end
+    print(string.format('位置转换[%d]==>[%d]', tagPositionParam, position))
+    return position
 end
 
 function GameData.ClearCurrentRoundData()

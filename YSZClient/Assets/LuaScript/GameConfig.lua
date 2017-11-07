@@ -163,6 +163,9 @@ EventDefine =
     NotifyZUJUBettingEvent = "NotifyZUJUBettingEvent",
     -- 组局厅玩家弃牌通知
     NotifyZUJUDropCardEvent = "NotifyZUJUDropCardEvent",
+    -- 组局厅玩家看牌通知
+    NotifyZUJULookCardEvent = "NotifyZUJULookCardEvent",
+
 
 }
 
@@ -485,13 +488,13 @@ ZUJURoomState =
 -- 百人厅 各房间状态CD时间
 ZUJUROOM_TIME =
 {
-    [ZUJURoomState.Start] = 9,
+    [ZUJURoomState.Start] = 99,
     [ZUJURoomState.Wait] = 5,
     [ZUJURoomState.SubduceBet] = 2,
-    [ZUJURoomState.Deal] = 3,
-    [ZUJURoomState.Betting] = 10,
-    [ZUJURoomState.CardVS] = 15,
-    [ZUJURoomState.Settlement] = 3,
+    [ZUJURoomState.Deal] = 2,
+    [ZUJURoomState.Betting] = 15,
+    [ZUJURoomState.CardVS] = 3,
+    [ZUJURoomState.Settlement] = 4,
 }
 
 -- 明牌(看牌)下注倍率

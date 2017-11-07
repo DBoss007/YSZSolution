@@ -2375,11 +2375,13 @@ function NetMsgHandler.ParseJHRoomBaseInfo(message)
     local BankerPosition = message:PopByte()
     GameData.RoomInfo.CurrentRoom.BetAllValue = message:PopInt64()
     GameData.RoomInfo.CurrentRoom.RoundTimes = message:PopByte()
+    local BettingPosition = message:PopByte()
     print('玩家真实位置:' .. GameData.RoomInfo.CurrentRoom.SelfPosition)
     print(string.format('底注min:%d 底注max:%d', GameData.RoomInfo.CurrentRoom.BetMin, GameData.RoomInfo.CurrentRoom.BetMax))
     -- 位置转换
     GameData.InitZUJURoomBettingValue(GameData.RoomInfo.CurrentRoom.BetMin)
     GameData.RoomInfo.CurrentRoom.BankerPosition = GameData.PlayerPositionConvert2ShowPosition(BankerPosition)
+    GameData.RoomInfo.CurrentRoom.BettingPosition = GameData.PlayerPositionConvert2ShowPosition(BettingPosition)
 end
 
 -- 解析房间玩家列表
@@ -2395,10 +2397,12 @@ function NetMsgHandler.ParseJHRoomPlayersInfo(message)
         local GoldValue = message:PopInt64()
         local severposition = message:PopByte()
         local PlayerState = message:PopByte()
-        local CheckState = message:PopByte()
-        local FoldState = message:PopByte()
+        local LookState = message:PopByte()
+        local DropCardState = message:PopByte()
         local CompareState = message:PopByte()
         local CompareResult = message:PopByte()
+        local ReadyState = message:PopByte()
+
         print(string.format('玩家基础信息ID:%d Name:%s Head:%d Url:%s Gold:%d Pos:%d 状态:%d', playerID, Name, HeadIcon, HeadUrl, GoldValue, severposition, PlayerState))
         print('玩家服务器位置:' .. severposition)
         if severposition == 0 then
@@ -2415,9 +2419,10 @@ function NetMsgHandler.ParseJHRoomPlayersInfo(message)
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].GoldValue = GoldValue
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Position = severposition
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState = PlayerState
-        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CheckState = CheckState
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].LookState = LookState
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CompareState = CompareState
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CompareResult = CompareResult
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].ReadyState = ReadyState
     end
 
     -- 玩家自己的 扑克牌解析
@@ -2504,7 +2509,8 @@ function NetMsgHandler.ParseZUJURoomStateSwitchToSubduceBet(message)
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].GoldValue = GoldValue
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].BetChipValue = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].BetChipValue + betValue
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PlayerState = Player_State.JoinOK
-
+        print('betValue：' .. betValue .. 'GoldValue:' .. GoldValue)
+        GameData.UpdateZUJUBetAllValue(betValue)
         -- 通知玩家下注了
         NetMsgHandler.NotifyPlayerBetting(position, betValue, 0)
     end
@@ -2533,6 +2539,8 @@ function NetMsgHandler.ParseZUJURoomStateSwitchToBetting(message)
     local BettingPosition = message:PopByte()
     local MingCardBetMin = message:PopUInt32()
     local DarkCardBetMin = message:PopUInt32()
+    local freePK = message:PopByte()
+
 
     BettingPosition = GameData.PlayerPositionConvert2ShowPosition(BettingPosition)
     MingCardBetMin = GameConfig.GetFormatColdNumber(MingCardBetMin)
@@ -2586,6 +2594,7 @@ function NetMsgHandler.ParseZUJURoomStateSwitchToCardVS(message)
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[ChallengeWinnerPosition].CompareState = 1
         GameData.RoomInfo.CurrentRoom.ZUJUPlayers[ChallengeWinnerPosition].CompareResult = 1
     end
+
     -- 判断本次挑战 是否有自己参加
 
     -- 通知挑战者下注
@@ -2666,8 +2675,8 @@ function NetMsgHandler.Received_S_JH_Delete_Player(message)
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].Position = 0
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].BetChipValue = 0
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].ReadyState = 0
-    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CheckState = 0
-    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].FoldState = 0
+    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].LookState = 0
+    GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].DropCardState = 0
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CompareState = 0
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].CompareResult = 0
     GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].IsWinner = false
@@ -2695,7 +2704,7 @@ function NetMsgHandler.Received_CS_JH_Exit_Room(message)
     CS.LoadingDataUI.Hide()
     local resultType = message:PopByte()
     if resultType == 0 then
-        -- NetMsgHandler.ExitRoomToHall(0)
+        NetMsgHandler.ExitRoomToHall(0)
     else
         CS.BubblePrompt.Show(data.GetString("CS_JH_Exit_Room_Error_" .. resultType), "GameUI1")
     end
@@ -2756,7 +2765,10 @@ function NetMsgHandler.Received_CS_JH_Betting(message)
         position = GameData.PlayerPositionConvert2ShowPosition(position)
         betValue = GameConfig.GetFormatColdNumber(betValue)
         GoldValue = GameConfig.GetFormatColdNumber(GoldValue)
-        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].ReadyState = readyState
+
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].GoldValue = GoldValue
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].BetChipValue = GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].BetChipValue + betValue
+        GameData.UpdateZUJUBetAllValue(betValue)
         -- 通知玩家下注了
         NetMsgHandler.NotifyPlayerBetting(position, betValue, betType)
     else
@@ -2815,6 +2827,8 @@ function NetMsgHandler.Received_CS_JH_Drop_Card(message)
     local resultType = message:PopByte()
     if resultType == 0 then
         local position = message:PopByte()
+        position = GameData.PlayerPositionConvert2ShowPosition(position)
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].DropCardState = 1
         CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyZUJUDropCardEvent, position)
     else
         CS.BubblePrompt.Show(data.GetString("Drop_Card_Error_" .. resultType), "GameUI1")
@@ -2824,7 +2838,39 @@ end
 -- ============================================================================--
 -- =============================CS_JH_Look_Card 813=========================--
 
+function NetMsgHandler.Send_CS_JH_Look_Card()
+    local message = CS.Net.PushMessage()
+    message:PushUInt32(GameData.RoleInfo.AccountID)
+    NetMsgHandler.SendMessageToGame(ProtrocolID.CS_JH_Look_Card, message)
+    print("---813--CS_JH_Drop_Card ID:" .. GameData.RoleInfo.AccountID)
+end
+
 -- 服务器反馈 看牌
 function NetMsgHandler.Received_CS_JH_Look_Card(message)
+    local resultType = message:PopByte()
+    if resultType == 0 then
+        local position = message:PopByte()
+        position = GameData.PlayerPositionConvert2ShowPosition(position)
+        local cardCount = message:PopUInt16()
+        for cardIndex = 1, cardCount, 1 do
+            local PokerType = message:PopByte()
+            local PokerNumber = message:PopByte()
+
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PokerList[cardIndex].PokerType = PokerType
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PokerList[cardIndex].PokerNumber = PokerNumber
+            GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].PokerList[cardIndex].Visible = true
+        end
+
+        GameData.RoomInfo.CurrentRoom.ZUJUPlayers[position].LookState = 1
+        CS.EventDispatcher.Instance:TriggerEvent(EventDefine.NotifyZUJULookCardEvent, position)
+    else
+        CS.BubblePrompt.Show(data.GetString("Drop_Card_Error_" .. resultType), "GameUI1")
+    end
+end
+
+
+-- 服务器广播玩家看牌消息
+function NetMsgHandler.Received_S_JH_Notify_Look_Card(message)
 
 end
+
